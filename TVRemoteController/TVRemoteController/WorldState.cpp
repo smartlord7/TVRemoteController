@@ -26,8 +26,8 @@ public:
 	WorldState& SetObserver(Observer observer) {
 		this->observer = observer;
 
-		observer.UpdateObsLookAt()
-			.UpdateObsPerspective();
+		observer.UpdateObsPerspective()
+			.UpdateObsLookAt();
 
 		return *this;
 	}

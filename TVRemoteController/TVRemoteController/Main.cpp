@@ -8,6 +8,7 @@
 using namespace EasyGL;
 
 static WorldState world = WorldState();
+static OpenGL gl = world.GetOpenGL();
 static int screenWidth, screenHeight;
 
 Color black = Color(BLACK),
@@ -26,17 +27,18 @@ void Init() {
 
 void Display() {
 
-	world.GetOpenGL().Clear(CLEAR_MODE)
-		.SetViewport(0, 0, screenWidth, screenHeight)
-		.SetColor(yellow);
+	gl.Clear(CLEAR_MODE)
+		.SetViewport(0, 0, screenWidth, screenHeight);
 
 	world.SetObserver(Observer(WORLD_INIT_FOV, (float) screenWidth / screenHeight, WORLD_MIN_Z, WORLD_MAX_Z,
 		Point3D(0, 0, 10),
 		Point3D(0, 0, 0),
 		Vector3D(0, 1, 0)));
 
+	gl.SetColor(yellow);
+
 	glFlush();
-	glutWireTeapot(10);
+	glutWireTeapot(2);
 	glutSwapBuffers();
 }
 

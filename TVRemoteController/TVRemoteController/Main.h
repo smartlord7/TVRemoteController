@@ -14,6 +14,14 @@
 
 //#endregion Window Parameters
 
-//#region Colors
+//#region World Parameters
+
+#define WORLD_INIT_FOV 45
+#define WORLD_MIN_Z 0.1
+#define WORLD_MAX_Z 10
+
+//#endregion World Parameters
+
+#define CLEAR_MODE GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT
 
 #endif MAIN_H

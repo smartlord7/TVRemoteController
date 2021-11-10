@@ -1,28 +1,43 @@
 #include <stdlib.h>
 #include "Main.h"
-#include "Window.h"
+#include "Window.cpp"
 #include "ScreenHelper.h"
 #include "Colors.h"
-#include "Window.cpp"
+#include "WorldState.cpp"
 
 using namespace EasyGL;
 
-void Init() {
-	glClearColor(BLACK);		
-	glEnable(GL_DEPTH_TEST);	
-	glShadeModel(GL_SMOOTH);	
+static WorldState world = WorldState();
+static int screenWidth, screenHeight;
 
-	
+Color black = Color(BLACK),
+	yellow = Color(YELLOW);
+
+void Init() {
+
+
+	world.GetOpenGL().ClearColor(black)
+		.Enable(GL_DEPTH_TEST)
+		.EnableArray(GL_VERTEX_ARRAY)
+		.EnableArray(GL_NORMAL_ARRAY)
+		.EnableArray(GL_COLOR_ARRAY)
+		.SetShadeModel(GL_SMOOTH);
 }
 
 void Display() {
 
-	glutWireTeapot(100);
-	glutSwapBuffers();
-	glEnableClientState(GL_VERTEX_ARRAY);
-	glEnableClientState(GL_NORMAL_ARRAY);
-	glEnableClientState(GL_COLOR_ARRAY);
+	world.GetOpenGL().Clear(CLEAR_MODE)
+		.SetViewport(0, 0, screenWidth, screenHeight)
+		.SetColor(yellow);
 
+	world.SetObserver(Observer(WORLD_INIT_FOV, (float) screenWidth / screenHeight, WORLD_MIN_Z, WORLD_MAX_Z,
+		Point3D(0, 0, 10),
+		Point3D(0, 0, 0),
+		Vector3D(0, 1, 0)));
+
+	glFlush();
+	glutWireTeapot(10);
+	glutSwapBuffers();
 }
 
 void ASCIIKeysListener(unsigned char key, int x, int y) {
@@ -34,7 +49,6 @@ void nonASCIIKeysListener(int key, int x, int y) {
 }
 
 int main(int argc, char * argv[]) {
-	int screenWidth, screenHeight;
 	GetDesktopResolution(screenWidth, screenHeight);
 
 	Init();

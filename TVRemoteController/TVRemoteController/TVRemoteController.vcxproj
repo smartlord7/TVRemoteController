@@ -139,14 +139,24 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Color.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="Observer.cpp" />
+    <ClCompile Include="OpenGL.cpp" />
+    <ClCompile Include="Point3D.cpp" />
     <ClCompile Include="ScreenHelper.cpp" />
+    <ClCompile Include="Vector3D.cpp" />
     <ClCompile Include="Window.cpp" />
     <ClCompile Include="WorldState.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Colors.h" />
+    <ClInclude Include="Color.h" />
+    <ClInclude Include="Main.h" />
+    <ClInclude Include="Observer.h" />
+    <ClInclude Include="OpenGL.h" />
+    <ClInclude Include="Point3D.h" />
     <ClInclude Include="ScreenHelper.h" />
+    <ClInclude Include="Vector3D.h" />
     <ClInclude Include="Window.h" />
     <ClInclude Include="WorldState.h" />
   </ItemGroup>

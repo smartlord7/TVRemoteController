@@ -13,10 +13,48 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Source Files\API">
+      <UniqueIdentifier>{4d65c86f-5dee-43b2-894c-a604d43a9757}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\API\EasyGL">
+      <UniqueIdentifier>{efb2cf5a-9528-421e-8585-9358d5484a23}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Helpers">
+      <UniqueIdentifier>{d58ad754-3864-4fef-b6c4-6eb50070107d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\API\Geometry">
+      <UniqueIdentifier>{828f1be8-69c4-4b50-8ff1-d8ee42182930}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\API\World">
+      <UniqueIdentifier>{7d92e203-23ba-440a-9473-40fa523f803f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="TVRemoteController.cpp">
+    <ClCompile Include="Main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Window.cpp">
+      <Filter>Source Files\API\EasyGL</Filter>
+    </ClCompile>
+    <ClCompile Include="ScreenHelper.cpp">
+      <Filter>Source Files\Helpers</Filter>
+    </ClCompile>
+    <ClCompile Include="WorldState.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Window.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ScreenHelper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Colors.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="WorldState.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

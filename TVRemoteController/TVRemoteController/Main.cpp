@@ -15,9 +15,7 @@ Color black = Color(BLACK),
 	yellow = Color(YELLOW);
 
 void Init() {
-
-
-	world.GetOpenGL().ClearColor(black)
+	gl.ClearColor(black)
 		.Enable(GL_DEPTH_TEST)
 		.EnableArray(GL_VERTEX_ARRAY)
 		.EnableArray(GL_NORMAL_ARRAY)

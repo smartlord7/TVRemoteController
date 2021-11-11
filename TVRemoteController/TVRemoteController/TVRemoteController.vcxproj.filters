@@ -28,62 +28,56 @@
     <Filter Include="Source Files\API\World">
       <UniqueIdentifier>{7d92e203-23ba-440a-9473-40fa523f803f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\API\Math">
+      <UniqueIdentifier>{26bd9c5d-ab07-425b-af18-c4c0ac77e676}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\API\Color">
+      <UniqueIdentifier>{877cf067-c6e5-4b7f-bf03-b6b881a16391}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Window.cpp">
+    <ClCompile Include="Window.h">
       <Filter>Source Files\API\EasyGL</Filter>
     </ClCompile>
     <ClCompile Include="ScreenHelper.cpp">
       <Filter>Source Files\Helpers</Filter>
     </ClCompile>
-    <ClCompile Include="OpenGL.cpp">
+    <ClCompile Include="OpenGL.h">
       <Filter>Source Files\API\EasyGL</Filter>
     </ClCompile>
-    <ClCompile Include="WorldState.cpp">
+    <ClCompile Include="WorldState.h">
       <Filter>Source Files\API\World</Filter>
     </ClCompile>
-    <ClCompile Include="Color.cpp">
-      <Filter>Source Files\API</Filter>
-    </ClCompile>
-    <ClCompile Include="Point3D.cpp">
+    <ClCompile Include="Point3D.h">
       <Filter>Source Files\API\Geometry</Filter>
     </ClCompile>
-    <ClCompile Include="Vector3D.cpp">
+    <ClCompile Include="Vector3D.h">
       <Filter>Source Files\API\Geometry</Filter>
     </ClCompile>
-    <ClCompile Include="Observer.cpp">
+    <ClCompile Include="Observer.h">
       <Filter>Source Files\API\EasyGL</Filter>
+    </ClCompile>
+    <ClCompile Include="Math.h">
+      <Filter>Source Files\API\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="Object3D.h">
+      <Filter>Source Files\API\Geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="Circle3D.h">
+      <Filter>Source Files\API\Geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="Color.h">
+      <Filter>Source Files\API\Color</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Window.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="ScreenHelper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Color.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="WorldState.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="OpenGL.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Main.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Point3D.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Vector3D.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Observer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

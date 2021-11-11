@@ -139,26 +139,22 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Color.cpp" />
+    <ClCompile Include="Circle3D.h" />
+    <ClCompile Include="Color.h" />
     <ClCompile Include="Main.cpp" />
-    <ClCompile Include="Observer.cpp" />
-    <ClCompile Include="OpenGL.cpp" />
-    <ClCompile Include="Point3D.cpp" />
+    <ClCompile Include="Math.h" />
+    <ClCompile Include="Observer.h" />
+    <ClCompile Include="OpenGL.h" />
+    <ClCompile Include="Point3D.h" />
+    <ClCompile Include="Object3D.h" />
     <ClCompile Include="ScreenHelper.cpp" />
-    <ClCompile Include="Vector3D.cpp" />
-    <ClCompile Include="Window.cpp" />
-    <ClCompile Include="WorldState.cpp" />
+    <ClCompile Include="Vector3D.h" />
+    <ClCompile Include="Window.h" />
+    <ClCompile Include="WorldState.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Color.h" />
     <ClInclude Include="Main.h" />
-    <ClInclude Include="Observer.h" />
-    <ClInclude Include="OpenGL.h" />
-    <ClInclude Include="Point3D.h" />
     <ClInclude Include="ScreenHelper.h" />
-    <ClInclude Include="Vector3D.h" />
-    <ClInclude Include="Window.h" />
-    <ClInclude Include="WorldState.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

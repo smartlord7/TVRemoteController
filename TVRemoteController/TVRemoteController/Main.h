@@ -3,7 +3,6 @@
 #ifndef MAIN_H
 #define MAIN_H
 
-#include <GL/glut.h>
 
 //#region Window Parameters
 
@@ -14,14 +13,17 @@
 
 //#endregion Window Parameters
 
-//#region World Parameters
+//#region Observer Parameters
 
-#define WORLD_INIT_FOV 45
-#define WORLD_MIN_Z 0.1
-#define WORLD_MAX_Z 10
+#define OBS_INIT_FOV 90.0
+#define OBS_INIT_MIN_RENDER_DIST 0.1
+#define OBS_INIT_MAX_RENDER_DIST 20.0
+#define OBS_INIT_POS 1.0, 2.0, 10.0
+#define OBS_INIT_TARGET 0.0, 0.0, 0.0
+#define OBS_INIT_UP_AXIS 0.0, 1.0, 0.0
 
-//#endregion World Parameters
+//#region Observer Parameters
 
-#define CLEAR_MODE GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT
+
 
 #endif MAIN_H

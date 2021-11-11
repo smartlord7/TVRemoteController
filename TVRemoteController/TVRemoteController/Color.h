@@ -1,14 +1,68 @@
-#pragma once
-// COLORS_H
-#ifndef COLORS_H
-#define COLORS_H
+#ifndef COLOR_H
+#define COLOR_H
 
-//#region Colors
+namespace EasyGL {
+	class Color {
+	private:
+		double r, g, b, a;
+	public:
+		Color() {
+		}
 
-#define BLACK 0.0, 0.0, 0.0, 1.0
-#define YELLOW 1.0, 1.0, 0.0, 1.0
+		Color(double r, double g, double b, double a) {
+			this->r = r;
+			this->g = g;
+			this->b = b;
+			this->a = a;
+		}
 
-//#endregion Colors
+		~Color() {
+		}
 
+		double GetRed() {
+			return r;
+		}
 
-#endif //#endregion Window Parameters
+		double GetGreen() {
+			return g;
+		}
+
+		double GetBlue() {
+			return b;
+		}
+
+		double GetAlpha() {
+			return a;
+		}
+
+		Color& SetRed(double r) {
+			this->r = r;
+
+			return *this;
+		}
+
+		Color& SetGreen(double g) {
+			this->g = g;
+
+			return *this;
+		}
+
+		Color& SetBlue(double b) {
+			this->b = b;
+
+			return *this;
+		}
+
+		Color& SetAlpha(float A) {
+			this->a = a;
+
+			return *this;
+		}
+
+		bool IsValid() {
+			return r >= 0 && g >= 0 && b >= 0 && a >= 0;
+		}
+	};
+}
+
+#endif COLOR_H

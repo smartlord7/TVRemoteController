@@ -24,6 +24,7 @@ BLUE = Color(0.0, 0.0, 1.0, 1.0);
 void Init() {
 	gl.ClearColor(BLACK)
 		.Enable(GL_DEPTH_TEST)
+		.Enable(GL_CULL_FACE)
 		.EnableArray(GL_VERTEX_ARRAY)
 		.EnableArray(GL_NORMAL_ARRAY)
 		.EnableArray(GL_COLOR_ARRAY)
@@ -45,7 +46,7 @@ void DisplayAxis() {
 	glVertex3d(0, OBS_INIT_MAX_RENDER_DIST / 4, 0);
 	glEnd();
 
-	//AxisEixo Z
+	//Axis Z
 	gl.SetColor(BLUE);
 	glBegin(GL_LINES);
 	glVertex3d(0, 0, 0);
@@ -53,10 +54,50 @@ void DisplayAxis() {
 	glEnd();
 }
 
-void DisplayFunc() {
+void DisplayControllerButtons() {
+    gl.SetColor(RED);
+    glTranslated(0.0, CONTROLLER_BUTTON_HEIGHT-world.GetButtonYPos(), 0.0);
+    glPushMatrix();
+    gl.DrawCylinder(CONTROLLER_BUTTON_RADIUS, CONTROLLER_BUTTON_HEIGHT);
+    glPopMatrix();
 
+    if (world.GetButtonState() != 0) {
+        if (world.GetButtonPressIterations() != 0 && world.GetButtonState() == 1) {
+            world.SetButtonYPos(world.GetButtonYPos() + CONTROLLER_BUTTON_PRESS_STEP);
+            world.SetButtonPressIterations(world.GetButtonPressIterations() - 1);
+        } else if (world.GetButtonPressIterations() == 0 && world.GetButtonState() == 1) {
+            world.SetButtonPressIterations(50);
+            world.SetButtonState(2);
+        } else if (world.GetButtonPressIterations() != 0 && world.GetButtonState() == 2) {
+            world.SetButtonYPos(world.GetButtonYPos() - CONTROLLER_BUTTON_PRESS_STEP);
+            world.SetButtonPressIterations(world.GetButtonPressIterations() - 1);
+        } else if (world.GetButtonPressIterations() == 0 && world.GetButtonState() == 2) {
+            world.SetButtonState(0);
+        }
+
+        glutPostRedisplay();
+    }
+}
+
+void DisplayController() {
+    gl.SetColor(YELLOW);
+    glPushMatrix();
+    glRotated(-90 + world.GetControllerYAngle(), 0, 1, 0);
+    glRotated(world.GetControllerZAngle(), 0, 0, 1);
+    glTranslated(0, 0, -CONTROLLER_SIZE_Z / 2);
+    glPushMatrix();
+    glScaled(CONTROLLER_SIZE_X, CONTROLLER_SIZE_Y, CONTROLLER_SIZE_Z);
+    glutSolidCube(1);
+    gl.SetColor(BLACK);
+    glutWireCube(1);
+    glPopMatrix();
+    DisplayControllerButtons();
+    glPopMatrix();
+}
+
+void DisplayFunc() {
     gl.Clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-            .SetViewport(0, 0, w.GetWidth(), w.GetHeight());
+        .SetViewport(0, 0, w.GetWidth(), w.GetHeight());
 
     if (firstRun) {
         world.SetObserver(Observer(OBS_INIT_FOV, (float) w.GetWidth() / w.GetHeight(), OBS_INIT_MIN_RENDER_DIST,
@@ -67,10 +108,9 @@ void DisplayFunc() {
         firstRun = false;
     }
 
-    DisplayAxis();
-    Cilinder3D cilinder = Cilinder3D(2, 2, 64);
-    cilinder.SetColor(BLACK);
-    gl.DrawObject(cilinder);
+
+       DisplayAxis();
+    DisplayController();
 
 	glFlush();
 	w.Refresh();
@@ -82,19 +122,19 @@ void ASCIIKeysListener(unsigned char key, int x, int y) {
 
     switch (key) {
         case 'd':
-            pos.SetX(pos.GetX() - OBS_HORIZONTAL_STEP);
-            tgt.SetX(tgt.GetX() - OBS_HORIZONTAL_STEP);
-            break;
-        case 'a':
             pos.SetX(pos.GetX() + OBS_HORIZONTAL_STEP);
             tgt.SetX(tgt.GetX() + OBS_HORIZONTAL_STEP);
             break;
+        case 'a':
+            pos.SetX(pos.GetX() - OBS_HORIZONTAL_STEP);
+            tgt.SetX(tgt.GetX() - OBS_HORIZONTAL_STEP);
+            break;
         case 's':
-            pos.SetZ(pos.GetZ() - OBS_HORIZONTAL_STEP);
-            tgt.SetZ(tgt.GetZ() - OBS_HORIZONTAL_STEP);
+            pos.SetZ(pos.GetZ() + OBS_HORIZONTAL_STEP);
+            tgt.SetZ(tgt.GetZ() + OBS_HORIZONTAL_STEP);
             break;
         case 'w':
-            pos.SetZ(pos.GetZ() + OBS_HORIZONTAL_STEP);
+            pos.SetZ(pos.GetZ() - OBS_HORIZONTAL_STEP);
             tgt.SetZ(tgt.GetZ() - OBS_HORIZONTAL_STEP);
             break;
         case ' ':
@@ -104,6 +144,24 @@ void ASCIIKeysListener(unsigned char key, int x, int y) {
         case '<':
             pos.SetY(pos.GetY() - OBS_VERTICAL_STEP);
             tgt.SetY(tgt.GetY() - OBS_VERTICAL_STEP);
+            break;
+        case 'j':
+            world.SetControllerYAngle(world.GetControllerYAngle() + CONTROLLER_SPIN_STEP);
+            break;
+        case 'l':
+            world.SetControllerYAngle(world.GetControllerYAngle() - CONTROLLER_SPIN_STEP);
+            break;
+        case 'i':
+            world.SetControllerZAngle(world.GetControllerZAngle() + CONTROLLER_SPIN_STEP);
+            break;
+        case 'k':
+            world.SetControllerZAngle(world.GetControllerZAngle() - CONTROLLER_SPIN_STEP);
+            break;
+        case 'p':
+            if (world.GetButtonState() == 0) {
+                world.SetButtonState(1);
+                world.SetButtonPressIterations(50);
+            }
             break;
     }
 

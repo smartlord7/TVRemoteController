@@ -1,6 +1,9 @@
 #ifndef EASY_GL_H
 #define EASY_GL_H
 
+#include <string>
+using namespace std;
+
 namespace Geometry {
 	class Point3D {
 	private:

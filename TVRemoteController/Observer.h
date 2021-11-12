@@ -130,7 +130,10 @@ namespace EasyGL {
 				.ResetMatrix()
 				.LookAt(pos.GetX(), pos.GetY(), pos.GetZ(), target.GetX(), target.GetY(), target.GetZ(), up.GetX(), up.GetY(), up.GetZ());
 
-			return *this;
+            //cout << "Look at: (" << pos.GetX() << ", " << pos.GetY() << ", " << pos.GetZ() << ") ("
+            //<< target.GetX() << ", " <<  target.GetY() << ", " << target.GetZ() << ")\n";
+
+            return *this;
 		}
 	};
 }

@@ -109,7 +109,39 @@ namespace EasyGL {
 			}
 			return *this;
 		}
-	};
+
+        OpenGL& DrawCylinder(double radius, double height, Point3D pos = Point3D(0, 0, 0), int res = 64) {
+            double x, z, angle = 0.0;
+
+            /** Draw the tube */
+            glBegin(GL_QUAD_STRIP);
+            angle = 0.0;
+            while( angle < 2 * PI ) {
+                x = radius * cos(angle);
+                z = radius * sin(angle);
+                glVertex3d(pos.GetX() + x, pos.GetY() + height, pos.GetZ() + z);
+                glVertex3d(pos.GetX() + x, pos.GetY() , pos.GetZ() + z);
+                angle = angle + 2 * PI / res;
+            }
+            glVertex3d(pos.GetX() + radius, pos.GetY() + height, pos.GetZ());
+            glVertex3d(pos.GetX() + radius, pos.GetY(), pos.GetZ());
+            glEnd();
+
+            /** Draw the circle on top of cylinder */
+            glBegin(GL_POLYGON);
+            angle = 0.0;
+            while( angle < 2 * PI ) {
+                x = radius * cos(angle);
+                z = radius * sin(angle);
+                glVertex3d(x, height, z);
+                angle = angle + 2 * PI / res;
+            }
+            glVertex3d(pos.GetX() + radius, pos.GetY() + height, pos.GetZ());
+            glEnd();
+
+            return *this;
+        }
+    };
 }
 
 #endif

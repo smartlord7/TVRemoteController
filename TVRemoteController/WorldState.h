@@ -17,7 +17,7 @@ public:
 	~WorldState() {
 	}
 
-	Observer GetObserver() {
+	Observer& GetObserver() {
 		return observer;
 	}
 

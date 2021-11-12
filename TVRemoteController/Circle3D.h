@@ -22,9 +22,11 @@ namespace Geometry {
 		int precision;
 	public:
 		Circle3D() {
+            SetType(GL_POLYGON);
 		}
 
 		Circle3D(double radius, int precision) {
+            SetType(GL_POLYGON);
 			this->radius = radius;
 			this->precision = precision;
 
@@ -44,10 +46,14 @@ namespace Geometry {
 
 		Circle3D& SetRadius(double radius) {
 			this->radius = radius;
+
+			return *this;
 		}
 
 		Circle3D& SetPrecision(int precision) {
 			this->precision = precision;
+
+			return *this;
 		}
 	};
 }

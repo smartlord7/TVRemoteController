@@ -65,4 +65,4 @@ namespace Geometry {
 	};
 }
 
-#endif VECTOR3D_H
+#endif

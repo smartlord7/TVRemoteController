@@ -1,1 +1,0 @@
-/usr/bin/c++.exe -g -Wl,--enable-auto-import CMakeFiles/TVRemoteController.dir/Main.cpp.o CMakeFiles/TVRemoteController.dir/ScreenHelper.cpp.o -o TVRemoteController.exe -Wl,--out-implib,libTVRemoteController.dll.a -Wl,--major-image-version,0,--minor-image-version,0 

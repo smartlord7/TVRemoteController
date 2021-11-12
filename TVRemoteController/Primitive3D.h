@@ -5,7 +5,7 @@
 #include <stdexcept>
 #include "Point3D.h"
 #include "Color.h"
-#include <GL/glut.h>
+#include "GL/glut.h"
 
 using namespace std;
 using namespace ColorTexture;

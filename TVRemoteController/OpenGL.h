@@ -2,7 +2,7 @@
 #define OPENGL_H
 
 #include "Math.h"
-#include <GL/glut.h>
+#include "GL/glut.h"
 #include "Color.h"
 #include "Primitive3D.h"
 #include "Math.h"

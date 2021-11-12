@@ -35,24 +35,19 @@ namespace Geometry {
 			primitive.SetType(GL_POLYGON);
 			primitive.SetColor(color);
 			primitive.SetBorderColor(borderColor);
-			angle = 0.0;
-			while (angle < 2 * PI) {
-				x = radius * cos(angle);
-				y = radius * sin(angle);
-				primitive.AddVertex(Point3D(x, y, height));
-				angle = angle + double(2 * PI / precision);
-			}
-			primitive.AddVertex(Point3D(radius, 0.0, height));
+            AddPrimitive(Circle3D(radius, precision));
 		}
 	public:
 		Cilinder3D() {
 		}
 
 		Cilinder3D(double radius, double height, int precision) {
-			this->height = height;
+            this->radius = radius;
+            this->height = height;
+            this->precision = precision;
 
-			_CalcVertexes();
-		}
+            _CalcVertexes();
+        }
 
 		~Cilinder3D() {
 		}
@@ -63,7 +58,19 @@ namespace Geometry {
 
 		Cilinder3D& SetHeight(double height) {
 			this->height = height;
+
+			return *this;
 		}
+
+        double GetRadius() {
+            return radius;
+        }
+
+        Cilinder3D& SetRadius(double radius) {
+            this->height = radius;
+
+            return *this;
+        }
 	};
 }
 

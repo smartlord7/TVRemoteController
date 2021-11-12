@@ -8,7 +8,7 @@
 namespace EasyGL {
 	class Observer {
 	private:
-		OpenGL openGL;
+		OpenGL gl;
 		double fieldOfVision,
 			aspect,
 			minRenderDist,
@@ -114,7 +114,7 @@ namespace EasyGL {
 		}
 
 		Observer& UpdateObsPerspective() {
-			openGL.SetMatrixMode(GL_PROJECTION)
+			gl.SetMatrixMode(GL_PROJECTION)
 				.ResetMatrix()
 				.SetPerspective(this->fieldOfVision, this->aspect, this->minRenderDist, this->maxRenderDist);
 
@@ -126,7 +126,7 @@ namespace EasyGL {
 				target = this->target;
 			Vector3D up = this->upAxis;
 
-			openGL.SetMatrixMode(GL_MODELVIEW)
+			gl.SetMatrixMode(GL_MODELVIEW)
 				.ResetMatrix()
 				.LookAt(pos.GetX(), pos.GetY(), pos.GetZ(), target.GetX(), target.GetY(), target.GetZ(), up.GetX(), up.GetY(), up.GetZ());
 

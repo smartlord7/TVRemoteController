@@ -1,20 +1,21 @@
 #ifndef WINDOW_H
 #define WINDOW_H
 
-#include <GL/glut.h>
+#include "GL/glut.h"
 
 namespace EasyGL {
-	class Window {
+	class GLWindow {
 		private:
 			unsigned int _displayMode;
-			int _width, _height, _posX, _posY;
+			int _width, _height;
+			double _posX, _posY;
 			const char* title;
 		public:
-			Window() {
+			GLWindow() {
 
 			}
 
-			Window(unsigned int displayMode, int width, int height, int posX, int posY, const char* title) {
+			GLWindow(unsigned int displayMode, int width, int height, int posX, int posY, const char* title) {
 				this->_displayMode = displayMode;
 				this->_width = width;
 				this->_height = height;
@@ -23,7 +24,7 @@ namespace EasyGL {
 				this->title = title;
 			}
 
-			~Window() {
+			~GLWindow() {
 
 			}
 
@@ -39,11 +40,11 @@ namespace EasyGL {
 				return _height;
 			}
 
-			int GetPosX() {
+            double GetPosX() {
 				return _posX;
 			}
 
-			int GetPosY() {
+            double GetPosY() {
 				return _posY;
 			}
 
@@ -51,56 +52,56 @@ namespace EasyGL {
 				return title;
 			}
 
-			Window& SetDisplayMode(unsigned int displayMode) {
+			GLWindow& SetDisplayMode(unsigned int displayMode) {
 				this->_displayMode = displayMode;
 
 				return *this;
 			}
 
-			Window& SetWidth(int width) {
+			GLWindow& SetWidth(int width) {
 				this->_width = width;
 
 				return *this;
 			}
 
-			Window& SetHeight(int height) {
+			GLWindow& SetHeight(int height) {
 				this->_height = height;
 
 				return *this;
 			}
 
-			Window& SetPosX(int posX) {
+			GLWindow& SetPosX(double posX) {
 				this->_posX = posX;
 
 				return *this;
 			}
 
-			Window& SetPosY(int posY) {
+			GLWindow& SetPosY(double posY) {
 				this->_posY = posY;
 
 				return *this;
 			}
 
-			Window& SetTitle(const char* title) {
+			GLWindow& SetTitle(const char* title) {
 				this->title = title;
 
 				return *this;
 			}
 
-			Window& AddDisplayCallback(void (GLUTCALLBACK* func)(void)) {
-				glutDisplayFunc(func);
+        GLWindow& AddDisplayCallback(void (* displayFunc)()) {
+            glutDisplayFunc(displayFunc);
 
-				return *this;
-			}
+            return *this;
+        }
 
-			Window& AddKeyboardListeners(void (GLUTCALLBACK* asciiKeysHandler)(unsigned char key, int x, int y), void (GLUTCALLBACK* nonAsciiKeysHandler)(int key, int x, int y)) {
-				glutKeyboardFunc(asciiKeysHandler);
-				glutSpecialFunc(nonAsciiKeysHandler);
+        GLWindow& AddKeyboardListeners(void (* asciiKeysHandler)( unsigned char, int, int ), void (* nonAsciiKeysHandler)( int, int, int ) ) {
+            glutKeyboardFunc(asciiKeysHandler);
+            glutSpecialFunc(nonAsciiKeysHandler);
 
-				return *this;
-			}
+            return *this;
+        }
 
-			Window& Open(int* argc, char* argv[]) {
+			GLWindow& Open(int* argc, char* argv[]) {
 				glutInit(argc, argv);
 				glutInitDisplayMode(_displayMode);
 				glutInitWindowSize(_width, _height);
@@ -110,13 +111,13 @@ namespace EasyGL {
 				return *this;
 			}
 
-			Window& Run() {
+			GLWindow& Run() {
 				glutMainLoop();
 
 				return *this;
 			}
 
-			Window& Refresh() {
+			GLWindow& Refresh() {
 				glutSwapBuffers();
 
 				return *this;
@@ -124,4 +125,4 @@ namespace EasyGL {
 	};
 }
 
-#endif WINDOW_H
+#endif

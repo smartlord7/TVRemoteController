@@ -65,4 +65,4 @@ namespace ColorTexture {
 	};
 }
 
-#endif COLOR_H
+#endif

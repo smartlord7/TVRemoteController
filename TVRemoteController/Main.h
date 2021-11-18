@@ -14,22 +14,9 @@ using namespace Geometry;
 const int DISPLAY_MODE = GLUT_DOUBLE | GLUT_RGB;
 const double WIN_POS_X = 0,
     WIN_POS_Y = 0;
-const char* WIN_TITLE = "TV Remote Controller";
+const char* WIN_TITLE = "TV Remote Controller  ";
 
 //#endregion GLWindow Parameters
-
-//#region Observer Parameters
-
-const double OBS_INIT_FOV = 45.0,
-        OBS_INIT_MIN_RENDER_DIST = 0.1,
-        OBS_INIT_MAX_RENDER_DIST = 40.0,
-        OBS_VERTICAL_STEP = 0.3,
-        OBS_HORIZONTAL_STEP = 0.3;
-Point3D OBS_INIT_POS = Point3D(0.2, 1, 5.3),
-        OBS_INIT_TARGET = Point3D(3.6, 1, -0.7);
-Vector3D OBS_INIT_UP_AXIS = Vector3D(0.0, 1.0, 0.0);
-
-//#region Observer Parameters
 
 //#region Scenery Parameters
 

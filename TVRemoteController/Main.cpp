@@ -3,14 +3,17 @@
 #include "ScreenHelper.h"
 #include "GLWindow.h"
 #include "WorldState.h"
+#include "Observer.h"
 #include "Circle3D.h"
 #include "Cilinder3D.h"
 #include "GL/glut.h"
 
+using namespace EasyGL;
 using namespace std;
 
 static auto w = GLWindow();
 static WorldState world = WorldState();
+static Observer& obs = world.GetObserver();
 static OpenGL gl = world.GetOpenGL();
 static bool firstRun = true;
 
@@ -32,25 +35,27 @@ void Init() {
 }
 
 void DisplayAxis() {
+    double minRenderDist = obs.GetMinRenderDist();
+
 	//Axis X
 	gl.SetColor(RED);
 	glBegin(GL_LINES);
 	glVertex3d(0, 0, 0);
-	glVertex3d(OBS_INIT_MAX_RENDER_DIST / 4, 0, 0);
+	glVertex3d(minRenderDist / 4, 0, 0);
 	glEnd();
 
 	//Axis Y
 	gl.SetColor(GREEN);
 	glBegin(GL_LINES);
 	glVertex3d(0, 0, 0);
-	glVertex3d(0, OBS_INIT_MAX_RENDER_DIST / 4, 0);
+	glVertex3d(0, minRenderDist / 4, 0);
 	glEnd();
 
 	//Axis Z
 	gl.SetColor(BLUE);
 	glBegin(GL_LINES);
 	glVertex3d(0, 0, 0);
-	glVertex3d(0, 0, OBS_INIT_MAX_RENDER_DIST / 4);
+	glVertex3d(0, 0, minRenderDist / 4);
 	glEnd();
 }
 
@@ -100,16 +105,11 @@ void DisplayFunc() {
         .SetViewport(0, 0, w.GetWidth(), w.GetHeight());
 
     if (firstRun) {
-        world.SetObserver(Observer(OBS_INIT_FOV, (float) w.GetWidth() / w.GetHeight(), OBS_INIT_MIN_RENDER_DIST,
-                                   OBS_INIT_MAX_RENDER_DIST,
-                                   OBS_INIT_POS,
-                                   OBS_INIT_TARGET,
-                                   OBS_INIT_UP_AXIS));
+        world.SetObserver(Observer((float) w.GetWidth() / (float) w.GetHeight()));
         firstRun = false;
     }
 
-
-       DisplayAxis();
+    DisplayAxis();
     DisplayController();
 
 	glFlush();
@@ -122,28 +122,22 @@ void ASCIIKeysListener(unsigned char key, int x, int y) {
 
     switch (key) {
         case 'd':
-            pos.SetX(pos.GetX() + OBS_HORIZONTAL_STEP);
-            tgt.SetX(tgt.GetX() + OBS_HORIZONTAL_STEP);
+            obs.MoveHorizontally(WALK_RIGHT);
             break;
         case 'a':
-            pos.SetX(pos.GetX() - OBS_HORIZONTAL_STEP);
-            tgt.SetX(tgt.GetX() - OBS_HORIZONTAL_STEP);
+            obs.MoveHorizontally(WALK_LEFT);
             break;
         case 's':
-            pos.SetZ(pos.GetZ() + OBS_HORIZONTAL_STEP);
-            tgt.SetZ(tgt.GetZ() + OBS_HORIZONTAL_STEP);
+            obs.MoveHorizontally(WALK_BACK);
             break;
         case 'w':
-            pos.SetZ(pos.GetZ() - OBS_HORIZONTAL_STEP);
-            tgt.SetZ(tgt.GetZ() - OBS_HORIZONTAL_STEP);
+            obs.MoveHorizontally(WALK_FRONT);
             break;
         case ' ':
-            pos.SetY(pos.GetY() + OBS_VERTICAL_STEP);
-            tgt.SetY(tgt.GetY() + OBS_VERTICAL_STEP);
+            obs.MoveVertically(FLY_UP);
             break;
         case '<':
-            pos.SetY(pos.GetY() - OBS_VERTICAL_STEP);
-            tgt.SetY(tgt.GetY() - OBS_VERTICAL_STEP);
+            obs.MoveVertically(FLY_DOWN);
             break;
         case 'j':
             world.SetControllerYAngle(world.GetControllerYAngle() + CONTROLLER_SPIN_STEP);
@@ -165,30 +159,25 @@ void ASCIIKeysListener(unsigned char key, int x, int y) {
             break;
     }
 
-    world.GetObserver().SetPosition(pos);
-    world.GetObserver().SetTarget(tgt);
     glutPostRedisplay();
 }
 
 void nonASCIIKeysListener(int key, int x, int y) {
-    Point3D tgt = world.GetObserver().GetTarget();
-
     switch (key) {
         case GLUT_KEY_LEFT:
-            tgt.SetX(tgt.GetX() - OBS_HORIZONTAL_STEP);
+            obs.MoveCamera(CAMERA_LEFT);
             break;
         case GLUT_KEY_RIGHT:
-            tgt.SetX(tgt.GetX() + OBS_HORIZONTAL_STEP);
+            obs.MoveCamera(CAMERA_RIGHT);
             break;
         case GLUT_KEY_DOWN:
-            tgt.SetY(tgt.GetY() - OBS_VERTICAL_STEP);
+            obs.MoveCamera(CAMERA_DOWN);
             break;
         case GLUT_KEY_UP:
-            tgt.SetY(tgt.GetY() + OBS_VERTICAL_STEP);
+            obs.MoveCamera(CAMERA_UP);
             break;
     }
 
-    world.GetObserver().SetTarget(tgt);
     glutPostRedisplay();
 }
 

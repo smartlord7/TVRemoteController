@@ -54,15 +54,43 @@ namespace Geometry {
 			return sqrt(x * x + y * y + z * z);
 		}
 
+		double GetAngle() {
+		    return atan(y / x);
+		}
+
+        Vector3D operator- () {
+            return Vector3D(-x, -y, -z);
+        }
+
+        Vector3D operator* (double multFac) {
+            return Vector3D(x * multFac, y * multFac, z * multFac);
+        }
+
+		Vector3D operator/(double divFac) {
+            Vector3D v = * this;
+            v = v * (1.0 / divFac);
+
+            return v;
+		}
+
+        Vector3D& operator=(Vector3D other) {
+            this->x = other.GetX();
+            this->y = other.GetY();
+            this->z = other.GetZ();
+
+            return *this;
+        }
+
+        Vector3D CrossProduct(Vector3D other) {
+            return Vector3D(y * other.GetZ() - z * other.GetY(), x * other.GetZ() - z * other.GetX(), x * other.GetY() - y * other.GetX());
+        }
+
 		Vector3D& Normalize() {
-			double length = GetLength();
-			this->x = x / length;
-			this->y = y / length;
-			this->z = z / length;
+            *this = *this / GetLength();
 
 			return *this;
 		}
-	};
+    };
 }
 
 #endif

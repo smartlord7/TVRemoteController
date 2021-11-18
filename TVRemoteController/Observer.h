@@ -4,6 +4,7 @@
 #include "Vector3D.h"
 #include "OpenGL.h"
 #include "Point3D.h"
+#include "ObserverEnum.h"
 
 namespace EasyGL {
 	class Observer {
@@ -16,17 +17,29 @@ namespace EasyGL {
 		Point3D position, target;
 		Vector3D upAxis;
 	public:
+	    static constexpr double OBS_INIT_FOV = 45.0,
+                OBS_INIT_MIN_RENDER_DIST = 0.1,
+                OBS_INIT_MAX_RENDER_DIST = 40.0,
+                OBS_WALK_STEP = 0.2,
+                OBS_CAMERA_STEP = 2,
+                OBS_HORIZONTAL_STEP = 0.1,
+                OBS_VERTICAL_STEP = 0.1;
+        Point3D ORIGIN = Point3D(0.0, 0.0, 0.0),
+                OBS_INIT_POS = ORIGIN,
+                OBS_INIT_TARGET = Point3D(0.0, 0.0, 1.0);
+        Vector3D OBS_INIT_UP_AXIS = Vector3D(0.0, 1.0, 0.0);
+
 		Observer() {
 		}
 
-		Observer(double fieldOfVision, double aspect, double minRenderDist, double maxRenderDist, Point3D position, Point3D target, Vector3D upAxis) {
-			this->fieldOfVision = fieldOfVision;
+		Observer(double aspect) {
+			this->fieldOfVision = OBS_INIT_FOV;
 			this->aspect = aspect;
-			this->minRenderDist = minRenderDist;
-			this->maxRenderDist = maxRenderDist;
-			this->position = position;
-			this->target = target;
-			this->upAxis = upAxis;
+			this->minRenderDist = OBS_INIT_MIN_RENDER_DIST;
+			this->maxRenderDist = OBS_INIT_MAX_RENDER_DIST;
+			this->position = OBS_INIT_POS;
+			this->target = OBS_INIT_TARGET;
+			this->upAxis = OBS_INIT_UP_AXIS;
 		}
 
 		double GetFieldOfVision() {
@@ -92,15 +105,11 @@ namespace EasyGL {
 		Observer& SetPosition(Point3D position) {
 			this->position = position;
 
-			UpdateObsLookAt();
-
             return *this;
 		}
 
 		Observer& SetTarget(Point3D target) {
 			this->target = target;
-
-			UpdateObsLookAt();
 
             return *this;
 		}
@@ -116,7 +125,7 @@ namespace EasyGL {
 		Observer& UpdateObsPerspective() {
 			gl.SetMatrixMode(GL_PROJECTION)
 				.ResetMatrix()
-				.SetPerspective(this->fieldOfVision, this->aspect, this->minRenderDist, this->maxRenderDist);
+				.SetPerspective(fieldOfVision, aspect, minRenderDist, maxRenderDist);
 
 			return *this;
 		}
@@ -130,10 +139,57 @@ namespace EasyGL {
 				.ResetMatrix()
 				.LookAt(pos.GetX(), pos.GetY(), pos.GetZ(), target.GetX(), target.GetY(), target.GetZ(), up.GetX(), up.GetY(), up.GetZ());
 
-            //cout << "Look at: (" << pos.GetX() << ", " << pos.GetY() << ", " << pos.GetZ() << ") ("
-            //<< target.GetX() << ", " <<  target.GetY() << ", " << target.GetZ() << ")\n";
+            return *this;
+		}
+
+		Observer& MoveVertically(ObserverEnum flyDirection) {
+            position.SetY(flyDirection == FLY_UP ? position.GetY() + OBS_VERTICAL_STEP : position.GetY() - OBS_VERTICAL_STEP);
+            target.SetY(flyDirection == FLY_UP ? target.GetY() + OBS_VERTICAL_STEP : target.GetY() - OBS_VERTICAL_STEP);
+
+            UpdateObsLookAt();
+
+		    return *this;
+		}
+
+		Observer& MoveHorizontally(ObserverEnum walkDirection) {
+            Vector3D eyeVector, walkVector;
+            double lengthEyeVector, lengthWalkVector;
+            eyeVector = target - position;
+
+            if (walkDirection == WALK_FRONT || walkDirection == WALK_BACK) {
+                lengthEyeVector = eyeVector.GetLength();
+
+                if (walkDirection == WALK_FRONT && lengthEyeVector < OBS_WALK_STEP) {
+                    lengthWalkVector = lengthEyeVector;
+                } else {
+                    lengthWalkVector = OBS_WALK_STEP;
+                }
+
+                walkVector = eyeVector * (lengthWalkVector / lengthEyeVector);
+
+                SetPosition(walkDirection == WALK_FRONT ? position + walkVector : position + (-walkVector));
+                if (walkDirection == WALK_FRONT) {
+                    SetTarget(target + walkVector);
+                }
+
+            }
+
+            UpdateObsLookAt();
 
             return *this;
+		}
+
+		Observer& MoveCamera(ObserverEnum cameraDirection) {
+            Vector3D eyeVector;
+            double lengthEyeVector, currAngle, nextAngle;
+
+            if (cameraDirection == CAMERA_LEFT || cameraDirection == CAMERA_RIGHT) {
+                eyeVector = target - position;
+                lengthEyeVector = eyeVector.GetLength();
+                currAngle = eyeVector.GetAngle();
+            }
+
+		    return *this;
 		}
 	};
 }

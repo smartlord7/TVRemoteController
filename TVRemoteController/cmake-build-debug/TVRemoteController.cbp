@@ -106,6 +106,9 @@
 		<Unit filename="/home/sancho/Documents/GitRepos/TVRemoteController/TVRemoteController/Observer.h">
 			<Option target="TVRemoteController"/>
 		</Unit>
+		<Unit filename="/home/sancho/Documents/GitRepos/TVRemoteController/TVRemoteController/ObserverEnum.h">
+			<Option target="TVRemoteController"/>
+		</Unit>
 		<Unit filename="/home/sancho/Documents/GitRepos/TVRemoteController/TVRemoteController/OpenGL.h">
 			<Option target="TVRemoteController"/>
 		</Unit>

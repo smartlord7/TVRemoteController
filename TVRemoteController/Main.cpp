@@ -35,27 +35,27 @@ void Init() {
 }
 
 void DisplayAxis() {
-    double minRenderDist = obs.GetMinRenderDist();
+    double maxRenderDist = obs.GetMaxRenderDist();
 
 	//Axis X
 	gl.SetColor(RED);
 	glBegin(GL_LINES);
 	glVertex3d(0, 0, 0);
-	glVertex3d(minRenderDist / 4, 0, 0);
+	glVertex3d(maxRenderDist / 4, 0, 0);
 	glEnd();
 
 	//Axis Y
 	gl.SetColor(GREEN);
 	glBegin(GL_LINES);
 	glVertex3d(0, 0, 0);
-	glVertex3d(0, minRenderDist / 4, 0);
+	glVertex3d(0, maxRenderDist / 4, 0);
 	glEnd();
 
 	//Axis Z
 	gl.SetColor(BLUE);
 	glBegin(GL_LINES);
 	glVertex3d(0, 0, 0);
-	glVertex3d(0, 0, minRenderDist / 4);
+	glVertex3d(0, 0, maxRenderDist / 4);
 	glEnd();
 }
 
@@ -176,6 +176,8 @@ void nonASCIIKeysListener(int key, int x, int y) {
         case GLUT_KEY_UP:
             obs.MoveCamera(CAMERA_UP);
             break;
+        default:
+            break<
     }
 
     glutPostRedisplay();

@@ -23,7 +23,7 @@ namespace EasyGL {
                 OBS_INIT_MIN_RENDER_DIST = 0.1,
                 OBS_INIT_MAX_RENDER_DIST = 40.0,
                 OBS_WALK_STEP = 0.05,
-                OBS_CAMERA_STEP = 2,
+                OBS_CAMERA_STEP = 0.2,
                 OBS_FLY_STEP = 0.05;
         Point3D ORIGIN = Point3D(0.0, 0.0, 0.0),
                 OBS_INIT_POS = Point3D(0.5, 0.85, -4.65),
@@ -196,11 +196,26 @@ namespace EasyGL {
 		}
 
 		Observer& MoveCamera(ObserverEnum cameraDirection) {
-		    Point3D newTarget;
+		    /*Point3D newTarget;
             Vector3D eyeVector, rightAxis;
-            double lengthEyeVector, currAngle, nextAngle;
+            double lengthEyeVector, currAngle, nextAngle;*/
+            switch (cameraDirection) {
 
-            if (cameraDirection == CAMERA_LEFT || cameraDirection == CAMERA_RIGHT) {
+                case CAMERA_LEFT:
+                    target.SetX(target.GetX() + OBS_CAMERA_STEP);
+                    break;
+                case CAMERA_RIGHT:
+                    target.SetX(target.GetX() - OBS_CAMERA_STEP);
+                    break;
+                case CAMERA_DOWN:
+                    target.SetY(target.GetY() - OBS_CAMERA_STEP);
+                    break;
+                case CAMERA_UP:
+                    target.SetY(target.GetY() + OBS_CAMERA_STEP);
+                    break;
+            }
+
+            /*if (cameraDirection == CAMERA_LEFT || cameraDirection == CAMERA_RIGHT) {
                 eyeVector = target - position;
                 lengthEyeVector = eyeVector.GetLength();
 
@@ -211,10 +226,12 @@ namespace EasyGL {
                                     position.GetZ() + lengthEyeVector * sin(nextAngle));
                 SetTarget(newTarget);
                 UpdateObsLookAt();
-            }
+            }*/
 
-		    return *this;
-		}
+            UpdateObsLookAt();
+
+            return *this;
+        }
 	};
 }
 

@@ -6,6 +6,8 @@
 #include "Point3D.h"
 #include "ObserverEnum.h"
 
+#define DEBUG
+
 namespace EasyGL {
 	class Observer {
 	private:
@@ -20,13 +22,12 @@ namespace EasyGL {
 	    static constexpr double OBS_INIT_FOV = 45.0,
                 OBS_INIT_MIN_RENDER_DIST = 0.1,
                 OBS_INIT_MAX_RENDER_DIST = 40.0,
-                OBS_WALK_STEP = 0.2,
+                OBS_WALK_STEP = 0.05,
                 OBS_CAMERA_STEP = 2,
-                OBS_HORIZONTAL_STEP = 0.1,
-                OBS_VERTICAL_STEP = 0.1;
+                OBS_FLY_STEP = 0.05;
         Point3D ORIGIN = Point3D(0.0, 0.0, 0.0),
-                OBS_INIT_POS = ORIGIN,
-                OBS_INIT_TARGET = Point3D(0.0, 0.0, 1.0);
+                OBS_INIT_POS = Point3D(0.5, 0.85, -4.65),
+                OBS_INIT_TARGET = Point3D(0.5, 0.85, 1.05);
         Vector3D OBS_INIT_UP_AXIS = Vector3D(0.0, 1.0, 0.0),
                 X_AXIS = Vector3D(1.0, 0.0, 0.0),
                 Y_AXIS = Vector3D(0.0, 1.0, 0.0),
@@ -135,19 +136,19 @@ namespace EasyGL {
 
 		Observer& UpdateObsLookAt() {
 			Point3D pos = this->position,
-				target = this->target;
+				tgt = this->target;
 			Vector3D up = this->upAxis;
 
 			gl.SetMatrixMode(GL_MODELVIEW)
 				.ResetMatrix()
-				.LookAt(pos.GetX(), pos.GetY(), pos.GetZ(), target.GetX(), target.GetY(), target.GetZ(), up.GetX(), up.GetY(), up.GetZ());
+				.LookAt(pos.GetX(), pos.GetY(), pos.GetZ(), tgt.GetX(), tgt.GetY(), tgt.GetZ(), up.GetX(), up.GetY(), up.GetZ());
 
             return *this;
 		}
 
 		Observer& MoveVertically(ObserverEnum flyDirection) {
-            position.SetY(flyDirection == FLY_UP ? position.GetY() + OBS_VERTICAL_STEP : position.GetY() - OBS_VERTICAL_STEP);
-            target.SetY(flyDirection == FLY_UP ? target.GetY() + OBS_VERTICAL_STEP : target.GetY() - OBS_VERTICAL_STEP);
+            position.SetY(flyDirection == FLY_UP ? position.GetY() + OBS_FLY_STEP : position.GetY() - OBS_FLY_STEP);
+            target.SetY(flyDirection == FLY_UP ? target.GetY() + OBS_FLY_STEP : target.GetY() - OBS_FLY_STEP);
 
             UpdateObsLookAt();
 
@@ -155,7 +156,7 @@ namespace EasyGL {
 		}
 
 		Observer& MoveHorizontally(ObserverEnum walkDirection) {
-            Vector3D eyeVector, walkVector;
+            Vector3D eyeVector, walkVector, sideAxis;
             double lengthEyeVector, lengthWalkVector;
             eyeVector = target - position;
 
@@ -174,12 +175,24 @@ namespace EasyGL {
                 if (walkDirection == WALK_FRONT) {
                     SetTarget(target + walkVector);
                 }
+            } else if (walkDirection == WALK_LEFT || walkDirection == WALK_RIGHT) {
+                sideAxis = walkDirection == WALK_LEFT ? -eyeVector.CrossProduct(upAxis) : eyeVector.CrossProduct(upAxis);
+                sideAxis.Normalize();
 
+                walkVector = sideAxis * OBS_WALK_STEP;
+
+                SetPosition(position + walkVector)
+                    .SetTarget(target + walkVector);
             }
 
             UpdateObsLookAt();
 
+            #ifdef DEBUG
+            cout << position.GetX() << ", " << position.GetY() << ", " << position.GetZ() << "\n";
+            cout << target.GetX() << ", " << target.GetY() << ", " << target.GetZ() << "\n\n";
             return *this;
+            #endif
+
 		}
 
 		Observer& MoveCamera(ObserverEnum cameraDirection) {

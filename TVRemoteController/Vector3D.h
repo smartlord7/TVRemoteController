@@ -54,15 +54,11 @@ namespace Geometry {
 			return sqrt(x * x + y * y + z * z);
 		}
 
-		double GetAngle() {
-		    return atan(y / x);
-		}
-
-        Vector3D operator- () {
+        Vector3D operator- () const{
             return Vector3D(-x, -y, -z);
         }
 
-        Vector3D operator* (double multFac) {
+        Vector3D operator* (double multFac) const {
             return Vector3D(x * multFac, y * multFac, z * multFac);
         }
 
@@ -79,6 +75,10 @@ namespace Geometry {
             this->z = other.GetZ();
 
             return *this;
+        }
+
+        double operator* (Vector3D other) {
+            return x * other.GetX() + y * other.GetY() + z * other.GetZ();
         }
 
         Vector3D CrossProduct(Vector3D other) {

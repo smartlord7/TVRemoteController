@@ -10,7 +10,6 @@ private:
 	OpenGL openGL = OpenGL();
 	Observer observer;
 	double controllerYAngle, controllerZAngle, buttonYPos;
-	int buttonPressIterations, buttonState;
 
 public:
 	WorldState() {
@@ -27,32 +26,12 @@ public:
 		return openGL;
 	}
 
-	int GetButtonState() {
-	    return buttonState;
-	}
-
-	WorldState& SetButtonState(int buttonState) {
-	    this->buttonState = buttonState;
-
-	    return *this;
-	}
-
 	double GetButtonYPos() {
 	    return buttonYPos;
 	}
 
 	WorldState& SetButtonYPos(double buttonYPos) {
 	    this->buttonYPos = buttonYPos;
-
-	    return *this;
-	}
-
-	int GetButtonPressIterations() {
-	    return buttonPressIterations;
-	}
-
-	WorldState& SetButtonPressIterations(int buttonPressIterations) {
-	    this->buttonPressIterations = buttonPressIterations;
 
 	    return *this;
 	}

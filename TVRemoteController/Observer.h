@@ -6,7 +6,7 @@
 #include "Point3D.h"
 #include "ObserverEnum.h"
 
-#define DEBUG
+#define DEBUG 0
 
 namespace EasyGL {
 	class Observer {
@@ -22,12 +22,12 @@ namespace EasyGL {
 	    static constexpr double OBS_INIT_FOV = 45.0,
                 OBS_INIT_MIN_RENDER_DIST = 0.1,
                 OBS_INIT_MAX_RENDER_DIST = 40.0,
-                OBS_WALK_STEP = 0.05,
+                OBS_WALK_STEP = 0.75,
                 OBS_CAMERA_STEP = 0.2,
                 OBS_FLY_STEP = 0.05;
         Point3D ORIGIN = Point3D(0.0, 0.0, 0.0),
-                OBS_INIT_POS = Point3D(0.5, 0.85, -4.65),
-                OBS_INIT_TARGET = Point3D(0.5, 0.85, 1.05);
+                OBS_INIT_POS = Point3D(0.0, 2.0, 8),
+                OBS_INIT_TARGET = Point3D(0.0, 0.0, 0.0);
         Vector3D OBS_INIT_UP_AXIS = Vector3D(0.0, 1.0, 0.0),
                 X_AXIS = Vector3D(1.0, 0.0, 0.0),
                 Y_AXIS = Vector3D(0.0, 1.0, 0.0),
@@ -174,7 +174,10 @@ namespace EasyGL {
                 SetPosition(walkDirection == WALK_FRONT ? position + walkVector : position + (-walkVector));
                 if (walkDirection == WALK_FRONT) {
                     SetTarget(target + walkVector);
-                }
+				}
+				else {
+					SetTarget(target + (-walkVector));
+				}
             } else if (walkDirection == WALK_LEFT || walkDirection == WALK_RIGHT) {
                 sideAxis = walkDirection == WALK_LEFT ? -eyeVector.CrossProduct(upAxis) : eyeVector.CrossProduct(upAxis);
                 sideAxis.Normalize();
@@ -187,11 +190,11 @@ namespace EasyGL {
 
             UpdateObsLookAt();
 
-            #ifdef DEBUG
+            #if DEBUG
             cout << position.GetX() << ", " << position.GetY() << ", " << position.GetZ() << "\n";
             cout << target.GetX() << ", " << target.GetY() << ", " << target.GetZ() << "\n\n";
-            return *this;
             #endif
+            return *this;
 
 		}
 
@@ -202,10 +205,10 @@ namespace EasyGL {
             switch (cameraDirection) {
 
                 case CAMERA_LEFT:
-                    target.SetX(target.GetX() + OBS_CAMERA_STEP);
+                    target.SetX(target.GetX() - OBS_CAMERA_STEP);
                     break;
                 case CAMERA_RIGHT:
-                    target.SetX(target.GetX() - OBS_CAMERA_STEP);
+                    target.SetX(target.GetX() + OBS_CAMERA_STEP);
                     break;
                 case CAMERA_DOWN:
                     target.SetY(target.GetY() - OBS_CAMERA_STEP);

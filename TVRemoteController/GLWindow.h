@@ -101,27 +101,46 @@ namespace EasyGL {
             return *this;
         }
 
-			GLWindow& Open(int* argc, char* argv[]) {
-				glutInit(argc, argv);
-				glutInitDisplayMode(_displayMode);
-				glutInitWindowSize(_width, _height);
-				glutInitWindowPosition(_posX, _posY);
-				glutCreateWindow(title);
+		GLWindow& Open(int* argc, char* argv[]) {
+			glutInit(argc, argv);
+			glutInitDisplayMode(_displayMode);
+			glutInitWindowSize(_width, _height);
+			glutInitWindowPosition(_posX, _posY);
+			glutCreateWindow(title);
 
-				return *this;
-			}
+			return *this;
+		}
 
-			GLWindow& Run() {
-				glutMainLoop();
+		GLWindow& Run() {
+			glutMainLoop();
 
-				return *this;
-			}
+			return *this;
+		}
 
-			GLWindow& Refresh() {
-				glutSwapBuffers();
+		GLWindow& Refresh() {
+			glutPostRedisplay();
 
-				return *this;
-			}
+			return *this;
+		}
+
+		GLWindow& RefreshDisplay() {
+			glutSwapBuffers();
+
+			return *this;
+		}
+
+		GLWindow& AddResizeCallback(void (*resizeFunc)(int height, int width)) {
+			glutReshapeFunc(resizeFunc);
+
+			return *this;
+		}
+
+		GLWindow& AddTimerCallback(void (*timerFunc)(int value)) {
+			glutTimerFunc(100, timerFunc, 1);
+
+			return *this;
+		}
+
 	};
 }
 

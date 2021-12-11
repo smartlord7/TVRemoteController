@@ -2,13 +2,18 @@
 #ifndef SCREEN_HELPER_H
 #define SCREEN_HELPER_H
 
-#include <X11/Xlib.h>
+#include "wtypes.h"
+#include <iostream>
+using namespace std;
 
 void GetDesktopResolution(int &width, int &height) {
-    Display *d = XOpenDisplay(nullptr);
-    Screen *s = DefaultScreenOfDisplay(d);
-    width = s->width;
-    height = s->height;
+    RECT desktop;
+    const HWND hDesktop = GetDesktopWindow();
+    GetWindowRect(hDesktop, &desktop);
+
+
+    height = desktop.right;
+    width = desktop.bottom;
 }
 
 #endif

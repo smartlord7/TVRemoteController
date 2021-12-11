@@ -135,8 +135,8 @@ namespace EasyGL {
 			return *this;
 		}
 
-		GLWindow& AddTimerCallback(void (*timerFunc)(int value)) {
-			glutTimerFunc(100, timerFunc, 1);
+		GLWindow& AddTimerCallback(int interval, void (*timerFunc)(int value)) {
+			glutTimerFunc(interval, timerFunc, 1);
 
 			return *this;
 		}

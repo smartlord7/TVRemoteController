@@ -1,11 +1,9 @@
-#include <iostream>
+﻿#include <iostream>
 #include "Main.h"
 #include "ScreenHelper.h"
 #include "GLWindow.h"
 #include "WorldState.h"
 #include "Observer.h"
-#include "Circle3D.h"
-#include "Cilinder3D.h"
 #include "GL/glut.h"
 #include "RgbImage.h"
 
@@ -16,6 +14,9 @@ static GLWindow w = GLWindow();
 static WorldState world = WorldState();
 static Observer& obs = world.GetObserver();
 static OpenGL gl = world.GetOpenGL();
+static Spinner&  fan = world.GetFan();
+static Controller& ctrl = world.GetController();
+static Television& tel = world.GetTelevision();
 static bool firstRun = true;
 static RgbImage img;
 
@@ -25,7 +26,11 @@ YELLOW = Color(1.0, 1.0, 0.0, 1.0),
 RED = Color(1.0, 0.0, 0.0, 1.0),
 GREEN = Color(0.0, 1.0, 0.0, 1.0),
 BLUE = Color(0.0, 0.0, 1.0, 1.0),
-GREY = Color(0.86, 0.86, 0.86, 1.0);
+GREY = Color(0.86, 0.86, 0.86, 1.0),
+ORANGE = Color(0.9, 0.4, 0.0, 1.0),
+PINK = Color(0.9, 0.1, 0.2, 1.0);
+
+Color tvColors[] = { BLACK, YELLOW, RED, GREEN, BLUE, GREY, ORANGE, PINK };
 
 static float vertexes[] = {
         1.0f,1.0f,1.0f,   -1.0f,1.0f,1.0f,   -1.0f,-1.0f,1.0f,   1.0f,-1.0f,1.0f,      // face #1
@@ -68,6 +73,7 @@ GLfloat texturesCoordes[] = {
 0, 1 };
 
 
+
 void InitLights() {
     glEnable(GL_LIGHT0);
     glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
@@ -93,6 +99,12 @@ void InitLights() {
     glLightfv(GL_LIGHT0, GL_CONSTANT_ATTENUATION, &LAttenuationConst);
     glLightfv(GL_LIGHT0, GL_LINEAR_ATTENUATION, &LAttenuationLinear);
     glLightfv(GL_LIGHT0, GL_QUADRATIC_ATTENUATION, &LAttenuationQuadrat);
+}
+
+void DisplayText(char* string, GLfloat x, GLfloat y, GLfloat z) {
+    glRasterPos3f(x, y, z);
+    while (*string)
+        glutBitmapCharacter(GLUT_BITMAP_HELVETICA_10, *string++);
 }
 
 void LoadTextures() {
@@ -126,32 +138,6 @@ void Init() {
     glTexCoordPointer(2, GL_FLOAT, 0, texturesCoordes);
     LoadTextures();
     InitLights();
-}
-
-
-void DisplayAxis() {
-    double maxRenderDist = obs.GetMaxRenderDist();
-
-	//Axis X
-	gl.SetColor(RED);
-	glBegin(GL_LINES);
-	glVertex3d(0, 0, 0);
-	glVertex3d(maxRenderDist / 4, 0, 0);
-	glEnd();
-
-	//Axis Y
-	gl.SetColor(GREEN);
-	glBegin(GL_LINES);
-	glVertex3d(0, 0, 0);
-	glVertex3d(0, maxRenderDist / 4, 0);
-	glEnd();
-
-	//Axis Z
-	gl.SetColor(BLUE);
-	glBegin(GL_LINES);
-	glVertex3d(0, 0, 0);
-	glVertex3d(0, 0, maxRenderDist / 4);
-	glEnd();
 }
 
 void DisplayFloor() {
@@ -211,7 +197,7 @@ void DisplayTable() {
             gl.DrawCube();
         glPopMatrix();
 
-        gl.SetColor(BLACK);
+        gl.SetColor(tel.GetColor());
         glPushMatrix();
         glScaled(1.25, 1.25, 2.25);
         glTranslated(0.0, 1.0 + 0.25, -0.10);
@@ -241,9 +227,34 @@ void DisplayTable() {
     glPopMatrix();
 }
 
+void HandleButton(int i) {
+    cout << i << "\n";
+    switch (i) {
+    case 0:
+    case 1:
+    case 2:
+        tel.SetColor(tvColors[i]);
+        break;
+    case 6:
+    case 7:
+    case 8:
+        tel.SetColor(tvColors[i - 3]);
+        break;
+    case 12:
+    case 13:
+    case 14:
+        break;
+        tel.SetColor(tvColors[i - 6]);
+    };
+
+    ctrl.GetButtons()[i].SetHandled(true);
+}
+
 void DisplayController() {
     Point3D target = obs.GetTarget();
-    double x, z;
+    Button btn;
+    double x, z, buttonAmp = 0;
+    int rows = 0, cols = 0, button = 0;
 
     gl.SetColor(YELLOW);
     glPushMatrix();
@@ -252,17 +263,46 @@ void DisplayController() {
             glScaled(0.8, 0.125, 3);
             gl.DrawCube();
         glPopMatrix();
-        gl.SetColor(RED);
 
         for (x = -0.35; x <= 0.35; x += 0.2) {
             for (z = -1.0; z <= 1.0; z += 0.4) {
+                if (rows == 0) {
+                    cols++;
+                }
+
+                if (ctrl.GetSelectedButton() == button) {
+                    gl.SetColor(GREEN);
+                } else {
+                    gl.SetColor(RED);
+                }
+                  
                 glPushMatrix();
-                    glTranslated(x + 0.05, 0, z + 0.05);
-                    gl.DrawCylinder(0.05, 0.05);
+
+
+                if (ctrl.GetPressedButtons().count(button)) {
+                    btn = ctrl.GetButtons()[button];
+
+                    buttonAmp = ctrl.GetButtons()[button].GetAmplitude();
+                    HandleButton(button);
+                }
+                else {
+                    buttonAmp = 0;
+                }
+
+                glTranslated(x + 0.05, -buttonAmp, z + 0.05);
+                gl.DrawCylinder(0.05, 0.05);
                 glPopMatrix();
+
+                button++;
             }
+            rows++;
+        }
+
+        if (!firstRun) {
+            ctrl.InitButtons(rows, cols);
         }
     glPopMatrix();
+
 }
 
 void DisplayFan() {
@@ -290,8 +330,16 @@ void DisplayFan() {
 
             gl.SetColor(BLACK);
             glPushMatrix();
+                glRotated(fan.GetAngle(), 0.0, 0.0, 1.0);
                 glScaled(1.0, 0.1, 1.0);
                 gl.DrawSquare();
+            glPopMatrix();
+
+            gl.SetColor(BLACK);
+            glPushMatrix();
+            glRotated(fan.GetAngle() + 90, 0.0, 0.0, 1.0);
+            glScaled(1.0, 0.1, 1.0);
+            gl.DrawSquare();
             glPopMatrix();
         glPopMatrix();
     glPopMatrix();
@@ -303,7 +351,6 @@ void DisplayFunc() {
 
     if (firstRun) {
         world.SetObserver(Observer((float) w.GetWidth() / (float) w.GetHeight()));
-        firstRun = false;
     }
 
     DisplayFloor();
@@ -313,11 +360,22 @@ void DisplayFunc() {
 
 	glFlush();
 	w.RefreshDisplay();
+    Sleep(0);
+
+    if (firstRun) {
+        firstRun = false;
+    }
 }
 
 void ASCIIKeysListener(unsigned char key, int x, int y) {
+    if (firstRun) {
+        return;
+    }
+
     Point3D pos = world.GetObserver().GetPosition(),
             tgt = world.GetObserver().GetTarget();
+    int btn = ctrl.GetSelectedButton();
+    int row = btn / ctrl.GetCols(), col = btn % ctrl.GetCols();
 
     switch (key) {
         case 'd':
@@ -343,6 +401,43 @@ void ASCIIKeysListener(unsigned char key, int x, int y) {
         case '>':
             obs.MoveVertically(FLY_DOWN);
             break;
+        case 'j':
+        case 'J':
+            if (row == 0) {
+                ctrl.SetSelectedButton((ctrl.GetRows() - 1) * ctrl.GetCols() + col);
+            } else {
+                ctrl.SetSelectedButton((row - 1) * ctrl.GetCols() + col);
+            }
+            break;
+        case 'l':
+        case 'L':
+            if (row == ctrl.GetRows() - 1) {
+                ctrl.SetSelectedButton(col);
+            } else {
+                ctrl.SetSelectedButton((row + 1) * ctrl.GetCols() + col);
+            }
+            break;
+        case 'i':
+        case 'I':
+            if (col == 0) {
+                ctrl.SetSelectedButton((row + 1) * ctrl.GetCols() - 1);
+            } else {
+                ctrl.SetSelectedButton(row * ctrl.GetCols() + col - 1);
+            }
+            break;
+        case 'k':
+        case 'K':
+            if (col == ctrl.GetCols() - 1) {
+                ctrl.SetSelectedButton(row * ctrl.GetCols());
+            } else {
+                ctrl.SetSelectedButton(row * ctrl.GetCols() + col + 1);
+            }
+
+            break;
+        case 'p':
+        case 'P':
+            ctrl.PressSelectedButton();
+            break;
         default:
             return;
     }
@@ -351,6 +446,10 @@ void ASCIIKeysListener(unsigned char key, int x, int y) {
 }
 
 void NonASCIIKeysListener(int key, int x, int y) {
+    if (firstRun) {
+        return;
+    }
+
     switch (key) {
         case GLUT_KEY_LEFT:
             obs.MoveCamera(CAMERA_LEFT);
@@ -377,24 +476,43 @@ void ResizeFunc(int width, int height) {
     w.Refresh();
 }
 
-int main(int argc, char * argv[]) {
-	int screenWidth, screenHeight;
-	GetDesktopResolution(screenWidth, screenHeight);
+void TimerFunc(int value) {
+    int time = 1;
 
-	Init();
+    world.GetFan().Spin(time);
+    w.Refresh().
+      AddTimerCallback(time, TimerFunc);
 
-	w = GLWindow().SetDisplayMode(DISPLAY_MODE)
-		.SetWidth(screenWidth)
-		.SetHeight(screenHeight)
-		.SetPosX(WIN_POS_X)
-		.SetPosY(WIN_POS_Y)
-		.SetTitle(WIN_TITLE)
-		.Open(&argc, argv);
+    if (!firstRun) {
+        ctrl.UpdateController(time);
+    }
+}
 
-	w.AddDisplayCallback(DisplayFunc)
-		.AddKeyboardListeners(ASCIIKeysListener, NonASCIIKeysListener)
+void InitConfig(int argc, char* argv[]) {
+    int screenWidth, screenHeight;
+    GetDesktopResolution(screenWidth, screenHeight);
+
+    Init();
+
+    w = GLWindow().SetDisplayMode(DISPLAY_MODE)
+        .SetWidth(screenWidth)
+        .SetHeight(screenHeight)
+        .SetPosX(WIN_POS_X)
+        .SetPosY(WIN_POS_Y)
+        .SetTitle(WIN_TITLE)
+        .Open(&argc, argv);
+
+    world.GetFan().Start();
+    w.AddDisplayCallback(DisplayFunc)
+        .AddKeyboardListeners(ASCIIKeysListener, NonASCIIKeysListener)
         .AddResizeCallback(ResizeFunc)
-		.Run();
+        .AddTimerCallback(100, TimerFunc)
+        .Run();
+
+}
+
+int main(int argc, char * argv[]) {
+    InitConfig(argc, argv);
 
 	return 0;
 }

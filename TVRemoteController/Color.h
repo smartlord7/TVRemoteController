@@ -1,11 +1,12 @@
 #ifndef COLOR_H
 #define COLOR_H
 
-namespace ColorTexture {
 	class Color {
 	private:
 		double r, g, b, a;
 	public:
+
+
 		Color() {
 		}
 
@@ -63,6 +64,5 @@ namespace ColorTexture {
 			return r >= 0 && g >= 0 && b >= 0 && a >= 0;
 		}
 	};
-}
 
 #endif

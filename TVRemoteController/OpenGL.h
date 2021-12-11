@@ -4,9 +4,7 @@
 #include "Math.h"
 #include "GL/glut.h"
 #include "Color.h"
-#include "Primitive3D.h"
 #include "Math.h"
-#include "Object3D.h"
 
 using namespace Geometry;
 
@@ -84,29 +82,6 @@ namespace EasyGL {
 		OpenGL& EnableArray(GLenum array) {
 			glEnableClientState(array);
 
-			return *this;
-		}
-
-		OpenGL& DrawObject(Object3D obj) {
-			for (Primitive3D primitive : obj.GetPrimitives()) {
-				SetColor(primitive.GetColor());
-				glBegin(primitive.GetType());
-
-				for (Point3D vertex : primitive.GetVertexes()) {
-					glVertex3d(vertex.GetX(), vertex.GetY(), vertex.GetZ());
-				}
-				glEnd();
-
-				if (primitive.GetBorderColor().IsValid()) {
-					SetColor(primitive.GetBorderColor());
-					glBegin(GL_LINES);
-
-					for (Point3D vertex : primitive.GetVertexes()) {
-						glVertex3d(vertex.GetX(), vertex.GetY(), vertex.GetZ());
-					}
-					glEnd();
-				}
-			}
 			return *this;
 		}
 

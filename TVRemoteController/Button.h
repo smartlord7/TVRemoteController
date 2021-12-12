@@ -1,6 +1,7 @@
-#include "ButtonState.h"
 #ifndef TVREMOTECONTROLLER_BUTTON_H
 #define TVREMOTECONTROLLER_BUTTON_H
+
+#include "ButtonState.h"
 
 class Button {
 private:

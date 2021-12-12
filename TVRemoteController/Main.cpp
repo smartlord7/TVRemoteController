@@ -1,4 +1,4 @@
-﻿#include <iostream>
+#include <iostream>
 #include "Main.h"
 #include "ScreenHelper.h"
 #include "GLWindow.h"
@@ -6,6 +6,8 @@
 #include "Observer.h"
 #include "GL/glut.h"
 #include "RgbImage.h"
+#include "Material.h"
+#include "Materials.h"
 
 using namespace EasyGL;
 using namespace std;
@@ -33,66 +35,17 @@ CYAN = Color(0.1, 0.9, 0.7, 1.0),
 OCEAN_BLUE = Color(0.3, 0.5, 1.0, 1.0);
 
 static vector<string> buttonLabels = { "1", "2", "3", "^", "+AC", "-AC", "4", "5", "6", "v", "X", "X", "7", "8", "9", "+b", "X", "X", "ON/OFF", "+v", "-v", "-b", "X", "X"};
-static float vertexes[] = {
-        1.0f,1.0f,1.0f,   -1.0f,1.0f,1.0f,   -1.0f,-1.0f,1.0f,   1.0f,-1.0f,1.0f,      // face #1
-        1.0f,1.0f,1.0f,    1.0f,-1.0f,1.0f,   1.0f,-1.0f,-1.0f,  1.0f,1.0f,-1.0f,      // face #2
-        1.0f,1.0f,1.0f,    1.0f,1.0f,-1.0f,  -1.0f,1.0f,-1.0f,  -1.0f,1.0f,1.0f,       // face #3
-       -1.0f,-1.0f,-1.0f, -1.0f,1.0f,-1.0f,   1.0f,1.0f,-1.0f,   1.0f,-1.0f,-1.0f,     // face #4
-       -1.0f,-1.0f,-1.0f, -1.0f,-1.0f,1.0f,  -1.0f,1.0f,1.0f,   -1.0f,1.0f,-1.0f,      // face #5
-       -1.0f,-1.0f,-1.0f,  1.0f,-1.0f,-1.0f,  1.0f,-1.0f,1.0f,  -1.0f,-1.0f,1.0f      // face #6
-};
 
-float normals[] = {
-    -1.0f, 0.0f, 0.0f,
-    -1.0f, 0.0f, 0.0f,
-    -1.0f, 0.0f, 0.0f,
-    -1.0f, 0.0f, 0.0f,
+GLfloat luzGlobalCorAmb[4] = { 0.3, 0.4,0.5, 1.0 };   // 
 
-};
+GLint   luzR = 1;		 	 //:::   'R'  
+GLint   luzG = 1;			 //:::   'G'  
+GLint   luzB = 1;			 //:::   'B'  
+GLfloat localPos[4] = { 0.0, 5.0, 0.0, 1.0 };
+GLfloat localCorAmb[4] = { 0, 0, 0, 0.0 };
+GLfloat localCorDif[4] = { luzR, luzG, luzB, 1.0 };
+GLfloat localCorEsp[4] = { luzR, luzG, luzB, 1.0 };
 
-GLuint textures[4];
-GLfloat texturesCoordes[] = {
-0, 0,
-1, 0,
-1, 1,
-0, 1,
-0, 0,
-1, 0,
-1, 1,
-0, 1,
-0, 0,
-1, 0,
-1, 1,
-0, 1 };
-
-
-
-void InitLights() {
-    glEnable(GL_LIGHT0);
-    glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
-
-    GLfloat LAmbient[4] = { 0.2f, 0.2f, 0.2f, 1.0 };
-    GLfloat LDiffuse[4] = { 1.0f, 1.0f, 1.0f, 1.f };
-    GLfloat LSpecular[4] = { 1.0f, 1.0f, 1.0f, 0.0f };
-    GLfloat LPosition[4] = {0, 5, 0 };
-    GLfloat LSpotDirec[3] = { 0.0,0.0,0.0 };
-    GLfloat LSpotCutOff = 180.0f;
-    GLfloat LSpotExponent = 0.0f;
-    GLfloat LAttenuationConst = 1.0f;
-    GLfloat LAttenuationLinear = 0.0f;
-    GLfloat LAttenuationQuadrat = 0.0f;
-
-    glLightfv(GL_LIGHT0, GL_AMBIENT, LAmbient);
-    glLightfv(GL_LIGHT0, GL_DIFFUSE, LDiffuse);
-    glLightfv(GL_LIGHT0, GL_SPECULAR, LSpecular);
-    glLightfv(GL_LIGHT0, GL_POSITION, LPosition);
-    glLightfv(GL_LIGHT0, GL_SPOT_DIRECTION, LSpotDirec);
-    glLightfv(GL_LIGHT0, GL_SPOT_CUTOFF, &LSpotCutOff);
-    glLightfv(GL_LIGHT0, GL_SPOT_EXPONENT, &LSpotExponent);
-    glLightfv(GL_LIGHT0, GL_CONSTANT_ATTENUATION, &LAttenuationConst);
-    glLightfv(GL_LIGHT0, GL_LINEAR_ATTENUATION, &LAttenuationLinear);
-    glLightfv(GL_LIGHT0, GL_QUADRATIC_ATTENUATION, &LAttenuationQuadrat);
-}
 
 void DisplayText(string str, GLfloat x, GLfloat y, GLfloat z) {
     glRasterPos3f(x, y, z);
@@ -101,109 +54,93 @@ void DisplayText(string str, GLfloat x, GLfloat y, GLfloat z) {
         glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, str[i++]);
 }
 
-void LoadTextures() {
-    glGenTextures(1, &textures[0]);
-    glBindTexture(GL_TEXTURE_2D, textures[0]);
-    img.LoadBmpFile("texture_floor.bmp");
-    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexImage2D(GL_TEXTURE_2D, 0, 3,
-        img.GetNumCols(),
-        img.GetNumRows(), 0, GL_RGB, GL_UNSIGNED_BYTE,
-        img.ImageData());
+void InitLights() {
+    glLightModelfv(GL_LIGHT_MODEL_AMBIENT, luzGlobalCorAmb);
+
+    glLightfv(GL_LIGHT0, GL_POSITION, localPos);
+    glLightfv(GL_LIGHT0, GL_AMBIENT, localCorAmb);
+    glLightfv(GL_LIGHT0, GL_DIFFUSE, localCorDif);
+    glLightfv(GL_LIGHT0, GL_SPECULAR, localCorEsp);
+  
+}
+
+void DisplayLights() {
+    glLightModelfv(GL_LIGHT_MODEL_AMBIENT, luzGlobalCorAmb);
+    glLightfv(GL_LIGHT0, GL_POSITION, localPos);
+    glLightfv(GL_LIGHT0, GL_AMBIENT, localCorAmb);
+    glLightfv(GL_LIGHT0, GL_DIFFUSE, localCorDif);
+    glLightfv(GL_LIGHT0, GL_SPECULAR, localCorEsp);
 }
 
 void Init() {
-	gl.ClearColor(BLACK)
-		.Enable(GL_CULL_FACE)
+    gl.ClearColor(WHITE)
+        .SetShadeModel(GL_SMOOTH)
+        .Enable(GL_DEPTH_TEST)
         .Enable(GL_NORMALIZE)
         .Enable(GL_LIGHTING)
-        .Enable(GL_COLOR_MATERIAL)
-		.Enable(GL_DEPTH_TEST)
-        .Enable(GL_BLEND)
-		.EnableArray(GL_VERTEX_ARRAY)
-		.EnableArray(GL_NORMAL_ARRAY)
-		.EnableArray(GL_COLOR_ARRAY)
-		.SetShadeModel(GL_SMOOTH);
+        .Enable(GL_LIGHT0);
 
-    glTexCoordPointer(2, GL_FLOAT, 0, texturesCoordes);
-    LoadTextures();
     InitLights();
 
    vector<Color> colorChannels = { CYAN, YELLOW, RED, GREEN, BLUE, GREY, ORANGE, PINK, OCEAN_BLUE };
    tel.SetColorChannels(colorChannels);
    world.GetFan().StartStop();
-
 }
 
 void DisplayFloor() {
-    bool colorFlag = false;
-    glEnable(GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_2D, textures[0]);
+    bool materialFlag = true;
 
     for (double x = -10; x <= 10; x++) {
         for (double z = -10; z <= 10; z++) {
-            if (colorFlag){
-                gl.SetColor(WHITE);
+            if (materialFlag) {
+                Material::BindMaterial(MATERIAL_JADE);
+            } else{
+                Material::BindMaterial(MATERIAL_COPPER);
             }
-            else {
-                gl.SetColor(BLACK);
-            }
 
-            glTexCoord2f(0.0f, 0.0f);
-            glTexCoord2f(1.0f, 0.0f);
-            glTexCoord2f(1.0f, 1.0f);
-            glTexCoord2f(0.0f, 1.0f);
+            glPushMatrix();
+                glNormal3d(0, 1, 0);
+                glBegin(GL_QUADS);
+                glVertex3d(x, 0, z);
+                glVertex3d(x, 0, z + 1.0);
+                glVertex3d(x + 1.0, 0, z + 1.0);
+                glVertex3d(x + 1.0, 0, z);
+                glEnd();
+            glPopMatrix();
 
-            glBegin(GL_QUADS);
-            glVertex3d(x, 0, z);
-            glVertex3d(x, 0, z + 1.0);
-            glVertex3d(x + 1.0, 0, z + 1.0);
-            glVertex3d(x + 1.0, 0, z);
-            glEnd();
-
-            colorFlag = !colorFlag;
+            materialFlag = !materialFlag;
         }
    }
-
-    glDisable(GL_TEXTURE_2D);
 }
 
 void DisplayTable() {
+    Material::BindMaterial(MATERIAL_COPPER);
     glPushMatrix();
         glTranslated(0.0, 0.325, -8.0);
-        gl.SetColor(GREEN);
         glPushMatrix();
             glScaled(4.0, 0.25, 3.0);
             glTranslated(0.0, 2.0, 0.0);
             gl.DrawCube();
         glPopMatrix();
 
-        gl.SetColor(GREY);
         glPushMatrix();
             glScaled(1.5, 1.25, 1.75);
             glTranslated(0.0, 1.0, 0.0);
             gl.DrawCube();
         glPopMatrix();
 
-        gl.SetColor(WHITE);
         glPushMatrix();
             glScaled(1.5, 1.5, 2.5);
             glTranslated(0.0, 1.0, 0.0);
             gl.DrawCube();
         glPopMatrix();
 
-        gl.SetColor(tel.GetChannel());
         glPushMatrix();
         glScaled(1.25, 1.25, 2.25);
         glTranslated(0.0, 1.0 + 0.25, -0.10);
         gl.DrawSquare();
         glPopMatrix();
 
-        gl.SetColor(BLUE);
         glPushMatrix();
             glScaled(0.1, 1 - 0.25, 0.1);
             glPushMatrix();
@@ -275,7 +212,7 @@ void DisplayController() {
     double x, z, buttonAmp = 0;
     int rows = 0, cols = 0, button = 0;
 
-    gl.SetColor(YELLOW);
+    Material::BindMaterial(MATERIAL_BLACK_PLASTIC);
     glPushMatrix();
         glTranslated(target.GetX(), target.GetY(), target.GetZ() + 2);
         glPushMatrix();
@@ -306,16 +243,17 @@ void DisplayController() {
                 }
 
                 glPushMatrix();
+                Material::BindMaterial(MATERIAL_WHITE_PLASTIC);
                     glTranslated(x + 0.05, -buttonAmp, z + 0.05);
                     if (ctrl.GetSelectedButton() == button) {
-                        gl.SetColor(GREEN);
+                        //gl.SetColor(GREEN);
                     }
                     else {
-                        gl.SetColor(RED);
+                        //gl.SetColor(RED);
                     }
 
                     gl.DrawCylinder(0.05, 0.05);
-                    gl.SetColor(WHITE);
+                    //gl.SetColor(WHITE);
                     glPushMatrix();
                         glScaled(0.1, 0.1, 0.1);
                         DisplayText(buttonLabels[button], 0, 0, 0);
@@ -341,31 +279,30 @@ void DisplayFan() {
         glRotated(-45, 0.0, 1.0, 0.0);
         glPushMatrix();
             glScaled(0.25, 4.0, 0.25);
-            gl.SetColor(GREEN);
+            //gl.SetColor(GREEN);
             gl.DrawCube();
         glPopMatrix();
         glPushMatrix();
         glTranslated(0.0, 2.0, 0.0);
-            gl.SetColor(RED);
+            //gl.SetColor(RED);
             glPushMatrix();
                 glRotated(90.0, 1.0, 0.0, 0.0);
                 gl.DrawCylinder(1, 0.5);
             glPopMatrix();
 
-            gl.SetColor(YELLOW);
+            //gl.SetColor(YELLOW);
             glPushMatrix();
                 glRotated(90.0, 1.0, 0.0, 0.0);
                 gl.DrawCylinder(0.75, 0.2);
             glPopMatrix();
 
-            gl.SetColor(BLACK);
             glPushMatrix();
                 glRotated(fan.GetAngle(), 0.0, 0.0, 1.0);
                 glScaled(1.0, 0.1, 1.0);
                 gl.DrawSquare();
             glPopMatrix();
 
-            gl.SetColor(BLACK);
+            //gl.SetColor(BLACK);
             glPushMatrix();
             glRotated(fan.GetAngle() + 90, 0.0, 0.0, 1.0);
             glScaled(1.0, 0.1, 1.0);
@@ -377,20 +314,19 @@ void DisplayFan() {
 
 void DisplayFunc() {
     gl.Clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-        .SetViewport(0, 0, w.GetWidth(), w.GetHeight());
+      .SetViewport(0, 0, w.GetWidth(), w.GetHeight());
 
     if (firstRun) {
         world.SetObserver(Observer((float) w.GetWidth() / (float) w.GetHeight()));
     }
 
+    DisplayLights();
     DisplayFloor();
     DisplayTable();
     DisplayController();
     DisplayFan();
 
-	glFlush();
 	w.RefreshDisplay();
-    Sleep(0);
 
     if (firstRun) {
         firstRun = false;
@@ -492,7 +428,6 @@ void NonASCIIKeysListener(int key, int x, int y) {
             break;
         case GLUT_KEY_UP:
             obs.MoveCamera(CAMERA_UP);
-            break;
         default:
             return;
     }
@@ -522,7 +457,6 @@ void InitConfig(int argc, char* argv[]) {
     int screenWidth, screenHeight;
     GetDesktopResolution(screenWidth, screenHeight);
 
-    Init();
 
     w = GLWindow().SetDisplayMode(DISPLAY_MODE)
         .SetWidth(screenWidth)
@@ -531,6 +465,8 @@ void InitConfig(int argc, char* argv[]) {
         .SetPosY(WIN_POS_Y)
         .SetTitle(WIN_TITLE)
         .Open(&argc, argv);
+
+    Init();
 
     w.AddDisplayCallback(DisplayFunc)
         .AddKeyboardListeners(ASCIIKeysListener, NonASCIIKeysListener)

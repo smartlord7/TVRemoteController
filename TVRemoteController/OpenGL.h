@@ -68,13 +68,19 @@ namespace EasyGL {
 		}
 
 		OpenGL& SetShadeModel(GLenum shadeModel) {
-			glShadeModel(GL_SMOOTH);
+			glShadeModel(shadeModel);
 
 			return *this;
 		}
 
 		OpenGL& Enable(GLenum feature) {
 			glEnable(feature);
+
+			return *this;
+		}
+
+		OpenGL& Disable(GLenum feature) {
+			glDisable(feature);
 
 			return *this;
 		}
@@ -98,65 +104,65 @@ namespace EasyGL {
 		}
 
 		OpenGL& DrawCube() {
-			glBegin(GL_QUADS);
-			// top
-			glNormal3f(0.0f, 1.0f, 0.0f);
-			glVertex3f(-0.5f, 0.5f, 0.5f);
-			glVertex3f(0.5f, 0.5f, 0.5f);
-			glVertex3f(0.5f, 0.5f, -0.5f);
-			glVertex3f(-0.5f, 0.5f, -0.5f);
+			glPushMatrix();
+				glNormal3f(0.0f, 1.0f, 0.0f);
+				glBegin(GL_QUADS);
+				glVertex3f(-0.5f, 0.5f, 0.5f);
+				glVertex3f(0.5f, 0.5f, 0.5f);
+				glVertex3f(0.5f, 0.5f, -0.5f);
+				glVertex3f(-0.5f, 0.5f, -0.5f);
+				glEnd();
+			glPopMatrix();
 
-			glEnd();
+			glPushMatrix();
+				glNormal3f(0.0f, 0.0f, 1.0f);
+				glBegin(GL_QUADS);
+				glVertex3f(0.5f, -0.5f, 0.5f);
+				glVertex3f(0.5f, 0.5f, 0.5f);
+				glVertex3f(-0.5f, 0.5f, 0.5f);
+				glVertex3f(-0.5f, -0.5f, 0.5f);
+				glEnd();
+			glPopMatrix();
 
-			glBegin(GL_QUADS);
-			// front
-			glNormal3f(0.0f, 0.0f, 1.0f);
-			glVertex3f(0.5f, -0.5f, 0.5f);
-			glVertex3f(0.5f, 0.5f, 0.5f);
-			glVertex3f(-0.5f, 0.5f, 0.5f);
-			glVertex3f(-0.5f, -0.5f, 0.5f);
+			glPushMatrix();
+				glNormal3f(1.0f, 0.0f, 0.0f);
+				glBegin(GL_QUADS);
+				glVertex3f(0.5f, 0.5f, -0.5f);
+				glVertex3f(0.5f, 0.5f, 0.5f);
+				glVertex3f(0.5f, -0.5f, 0.5f);
+				glVertex3f(0.5f, -0.5f, -0.5f);
+				glEnd();
+			glPopMatrix();
 
-			glEnd();
+			glPushMatrix();
+				glNormal3f(-1.0f, 0.0f, 0.0f);
+				glBegin(GL_QUADS);
+				glVertex3f(-0.5f, -0.5f, 0.5f);
+				glVertex3f(-0.5f, 0.5f, 0.5f);
+				glVertex3f(-0.5f, 0.5f, -0.5f);
+				glVertex3f(-0.5f, -0.5f, -0.5f);
+				glEnd();
+			glPopMatrix();
 
-			glBegin(GL_QUADS);
-			// right
-			glNormal3f(1.0f, 0.0f, 0.0f);
-			glVertex3f(0.5f, 0.5f, -0.5f);
-			glVertex3f(0.5f, 0.5f, 0.5f);
-			glVertex3f(0.5f, -0.5f, 0.5f);
-			glVertex3f(0.5f, -0.5f, -0.5f);
+			glPushMatrix();
+				glNormal3f(0.0f, -1.0f, 0.0f);
+				glBegin(GL_QUADS);
+				glVertex3f(0.5f, -0.5f, 0.5f);
+				glVertex3f(-0.5f, -0.5f, 0.5f);
+				glVertex3f(-0.5f, -0.5f, -0.5f);
+				glVertex3f(0.5f, -0.5f, -0.5f);
+				glEnd();
+			glPopMatrix();
 
-			glEnd();
-
-			glBegin(GL_QUADS);
-			// left
-			glNormal3f(-1.0f, 0.0f, 0.0f);
-			glVertex3f(-0.5f, -0.5f, 0.5f);
-			glVertex3f(-0.5f, 0.5f, 0.5f);
-			glVertex3f(-0.5f, 0.5f, -0.5f);
-			glVertex3f(-0.5f, -0.5f, -0.5f);
-
-			glEnd();
-
-			glBegin(GL_QUADS);
-			// bottom
-			glNormal3f(0.0f, -1.0f, 0.0f);
-			glVertex3f(0.5f, -0.5f, 0.5f);
-			glVertex3f(-0.5f, -0.5f, 0.5f);
-			glVertex3f(-0.5f, -0.5f, -0.5f);
-			glVertex3f(0.5f, -0.5f, -0.5f);
-
-			glEnd();
-
-			glBegin(GL_QUADS);
-			// back
-			glNormal3f(0.0f, 0.0f, -1.0f);
-			glVertex3f(0.5f, 0.5f, -0.5f);
-			glVertex3f(0.5f, -0.5f, -0.5f);
-			glVertex3f(-0.5f, -0.5f, -0.5f);
-			glVertex3f(-0.5f, 0.5f, -0.5f);
-
-			glEnd();
+			glPushMatrix();
+				glNormal3f(0.0f, 0.0f, -1.0f);
+				glBegin(GL_QUADS);
+				glVertex3f(0.5f, 0.5f, -0.5f);
+				glVertex3f(0.5f, -0.5f, -0.5f);
+				glVertex3f(-0.5f, -0.5f, -0.5f);
+				glVertex3f(-0.5f, 0.5f, -0.5f);
+				glEnd();
+			glPopMatrix();
 
 			return *this;
 		}

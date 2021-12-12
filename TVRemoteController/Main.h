@@ -11,7 +11,7 @@ using namespace Geometry;
 
 //#region GLWindow Parameters
 
-const int DISPLAY_MODE = GLUT_DOUBLE | GLUT_RGB;
+const int DISPLAY_MODE = GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH;
 const double WIN_POS_X = 0,
     WIN_POS_Y = 0;
 const char* WIN_TITLE = "TV Remote Controller  ";

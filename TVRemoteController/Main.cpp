@@ -36,15 +36,17 @@ OCEAN_BLUE = Color(0.3, 0.5, 1.0, 1.0);
 static vector<string> buttonLabels = { "1", "2", "3", "^", "+AC", "-AC", "4", "5", "6", "v", "X", "X", "7", "8", "9", "+b", "X", "X", "ON/OFF", "+v", "-v", "-b", "X", "X"};
 static GLfloat ambientLight[4] = { 0.3, 0.4,0.5, 1.0 };
 
-static GLint   r = 0;
-static GLint   g = 0;
-static GLint   b = 0;
+
 static GLfloat localLightPos[4] = { 0.0, 3.0, -6.0, 1.0 };
 static GLfloat localLightAmb[4] = { 0, 0, 0, 0.0 };
-static GLfloat localLightDif[4] = { r, g, b, 1.0 };
-static GLfloat localLightSpec[4] = { r, g, b, 1.0 };
+static GLfloat localLightDif[4] = { 0, 0, 0, 1.0 };
+static GLfloat localLightSpec[4] = { 0, 0, 0, 1.0 };
+static GLfloat dirLightPos[4] = { 0.0, 5.0, 0.0, 0.0 };
+static GLfloat dirLightAmb[4] = { 1, 1, 1, 0.0 };
+static GLfloat dirLightDif[4] = { 1, 1, 1, 1.0 };
+static GLfloat dirLightSpec[4] = { 1, 1, 1, 1.0 };
 
-static GLuint textures[5];
+static GLuint textures[12];
 
 void DisplayText(string str, GLfloat x, GLfloat y, GLfloat z) {
     glRasterPos3f(x, y, z);
@@ -73,6 +75,8 @@ void LoadTextures() {
     LoadTexture("texture_floor.bmp", &textures[0]);
     LoadTexture("texture_table.bmp", &textures[1]);
     LoadTexture("texture_walls.bmp", &textures[2]);
+    LoadTexture("texture_channel1.bmp", &textures[3]);
+    LoadTexture("texture_channel2.bmp", &textures[4]);
 }
 
 void DisplayLights() {
@@ -82,7 +86,6 @@ void DisplayLights() {
     glLightfv(GL_LIGHT0, GL_DIFFUSE, localLightDif);
     glLightfv(GL_LIGHT0, GL_SPECULAR, localLightSpec);
 }
-
 
 void Init() {
     gl.ClearColor(WHITE)
@@ -240,11 +243,9 @@ void DisplayTable() {
         glPopMatrix();
 
         Material::BindMaterial(MATERIAL_BLACK_PLASTIC);
-        glEnable(GL_TEXTURE_2D);
-        glBindTexture(GL_TEXTURE_2D, textures[1]);
         glPushMatrix();
-            glScaled(1.5, 1.5, 2.5);
-            glTranslated(0.0, 1.0, 0.0);
+            glScaled(2.0, 2.0, 2.5);
+            glTranslated(0.0, 0.75, 0.0);
             gl.DrawCube();
         glPopMatrix();
 
@@ -376,6 +377,13 @@ void DisplayController() {
             glScaled(0.10, 0.08, 0.10);
             glTranslated(0.0, 0.0, 15.0);
             glutSolidSphere(1.0, 30, 30);
+            Material::BindMaterial(MATERIAL_BLACK_PLASTIC);
+            glPushMatrix();
+                glRotated(ctrl.GetSpinnerAngle() + 90, 0.0, 0.0, 1.0);
+                glScaled(1.5, 0.75, 0.25);
+                glTranslated(0.0, 0.0, 3.5);
+                gl.DrawCube();
+            glPopMatrix();
         glPopMatrix();
 
         for (x = -0.35; x <= 0.35; x += 0.2) {
@@ -411,10 +419,10 @@ void DisplayController() {
                     glScaled(0.06, 0.06, 0.06);
                     glRotated(90, 1.0, 0.0, 0.0);
                     glutSolidDodecahedron();
-                    glPushMatrix();
+                    /**glPushMatrix();
                         Material::BindMaterial(MATERIAL_BLACK_PLASTIC);
                         DisplayText(buttonLabels[button], 0, 0, 0);
-                    glPopMatrix();
+                    glPopMatrix();**/
                 glPopMatrix();
 
                 button++;
@@ -566,6 +574,46 @@ void ASCIIKeysListener(unsigned char key, int x, int y) {
         case 'P':
             ctrl.PressSelectedButton();
             break;
+        case 'b':
+        case 'B':
+            ctrl.DecSpinnerAngle();
+            break;
+        case 'm':
+        case 'M':
+            ctrl.IncSpinnerAngle();
+            break;
+        case '1':
+            if (tel.IsOn()) {
+                localLightDif[0] = 1;
+                localLightDif[1] = 0;
+                localLightDif[2] = 0;
+                localLightSpec[0] = 1;
+                localLightSpec[1] = 0;
+                localLightSpec[2] = 0;
+                glLightfv(GL_LIGHT0, GL_DIFFUSE, localLightDif);
+            }
+            break;
+        case '2':
+            if (tel.IsOn()) {
+                localLightDif[0] = 0;
+                localLightDif[1] = 1;
+                localLightDif[2] = 0;
+                localLightSpec[0] = 0;
+                localLightSpec[1] = 1;
+                localLightSpec[2] = 0;
+                glLightfv(GL_LIGHT0, GL_DIFFUSE, localLightDif);
+            }
+            break;
+        case '3':
+            if (tel.IsOn()) {
+                localLightDif[0] = 0;
+                localLightDif[1] = 0;
+                localLightDif[2] = 1;
+                localLightSpec[0] = 0;
+                localLightSpec[1] = 0;
+                localLightSpec[2] = 1;
+                glLightfv(GL_LIGHT0, GL_DIFFUSE, localLightDif);
+            }
         default:
             return;
     }

@@ -40,25 +40,25 @@ public:
 		return coef;
 	}
 
-	Material& GetAmbientLight(Color ambientLight) {
+	Material& SetAmbientLight(Color ambientLight) {
 		this->ambientLight = ambientLight;
 
 		return *this;
 	}
 
-	Material& GetDiffuseLight(Color diffuseLight) {
+	Material& SetDiffuseLight(Color diffuseLight) {
 		this->diffuseLight = diffuseLight;
 
 		return *this;
 	}
 
-	Material& GetSpecularLight(Color specularLight) {
+	Material& SetSpecularLight(Color specularLight) {
 		this->specularLight = specularLight;
 
 		return *this;
 	}
 
-	Material& GetCoef(double coef) {
+	Material& SetCoef(double coef) {
 		this->coef = coef;
 
 		return *this;

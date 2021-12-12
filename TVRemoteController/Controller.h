@@ -14,8 +14,11 @@ private:
 	int latestPressedButton;
 	int rows;
 	int cols;
+	double spinnerAngle;
 
 public:
+	const double DEFAULT_CONTROLLER_SPIN_ANGLE_STEP = 3.0;
+
 	Controller() {
 	}
 
@@ -36,6 +39,10 @@ public:
 
 	int GetCols() {
 		return cols;
+	}
+
+	double GetSpinnerAngle() {
+		return spinnerAngle;
 	}
 
 	Controller& InitButtons(int rows, int cols, vector<string> labels) {
@@ -67,6 +74,26 @@ public:
 
 		for (; i < buttons.size(); i++) {
 			buttons[i].Update(time);
+		}
+
+		return *this;
+	}
+
+	Controller& IncSpinnerAngle() {
+		double nextAngle = spinnerAngle + DEFAULT_CONTROLLER_SPIN_ANGLE_STEP;
+
+		if (nextAngle <= 360.0) {
+			spinnerAngle = nextAngle;
+		}
+
+		return *this;
+	}
+
+	Controller& DecSpinnerAngle() {
+		double nextAngle = spinnerAngle - DEFAULT_CONTROLLER_SPIN_ANGLE_STEP;
+
+		if (nextAngle >= 0) {
+			spinnerAngle = nextAngle;
 		}
 
 		return *this;

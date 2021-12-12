@@ -142,6 +142,7 @@ public:
 	Television& SetBrightness(double brightness) {
 		if (on && 0.0 < brightness && brightness <= 1.0) {
 			this->brightness = brightness;
+			this->onMaterial.SetSpecularLight(Color(onMaterial.GetSpecularLight().GetRed() * brightness, onMaterial.GetSpecularLight().GetGreen() * brightness, onMaterial.GetSpecularLight().GetBlue() * brightness));
 		}
 
 		return *this;

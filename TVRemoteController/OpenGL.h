@@ -107,9 +107,13 @@ namespace EasyGL {
 			glPushMatrix();
 				glNormal3f(0.0f, 1.0f, 0.0f);
 				glBegin(GL_QUADS);
+				glTexCoord2f(0.0f, 0.0f);
 				glVertex3f(-0.5f, 0.5f, 0.5f);
+				glTexCoord2f(1.0f, 0.0f);
 				glVertex3f(0.5f, 0.5f, 0.5f);
+				glTexCoord2f(1.0f, 1.0f);
 				glVertex3f(0.5f, 0.5f, -0.5f);
+				glTexCoord2f(0.0f, 1.0f);
 				glVertex3f(-0.5f, 0.5f, -0.5f);
 				glEnd();
 			glPopMatrix();
@@ -117,9 +121,13 @@ namespace EasyGL {
 			glPushMatrix();
 				glNormal3f(0.0f, 0.0f, 1.0f);
 				glBegin(GL_QUADS);
+				glTexCoord2f(0.0f, 0.0f);
 				glVertex3f(0.5f, -0.5f, 0.5f);
+				glTexCoord2f(1.0f, 0.0f);
 				glVertex3f(0.5f, 0.5f, 0.5f);
+				glTexCoord2f(1.0f, 1.0f);
 				glVertex3f(-0.5f, 0.5f, 0.5f);
+				glTexCoord2f(0.0f, 1.0f);
 				glVertex3f(-0.5f, -0.5f, 0.5f);
 				glEnd();
 			glPopMatrix();
@@ -127,9 +135,13 @@ namespace EasyGL {
 			glPushMatrix();
 				glNormal3f(1.0f, 0.0f, 0.0f);
 				glBegin(GL_QUADS);
+				glTexCoord2f(0.0f, 0.0f);
 				glVertex3f(0.5f, 0.5f, -0.5f);
+				glTexCoord2f(1.0f, 0.0f);
 				glVertex3f(0.5f, 0.5f, 0.5f);
+				glTexCoord2f(1.0f, 1.0f);
 				glVertex3f(0.5f, -0.5f, 0.5f);
+				glTexCoord2f(0.0f, 1.0f);
 				glVertex3f(0.5f, -0.5f, -0.5f);
 				glEnd();
 			glPopMatrix();
@@ -137,9 +149,13 @@ namespace EasyGL {
 			glPushMatrix();
 				glNormal3f(-1.0f, 0.0f, 0.0f);
 				glBegin(GL_QUADS);
+				glTexCoord2f(0.0f, 0.0f);
 				glVertex3f(-0.5f, -0.5f, 0.5f);
+				glTexCoord2f(1.0f, 0.0f);
 				glVertex3f(-0.5f, 0.5f, 0.5f);
+				glTexCoord2f(1.0f, 1.0f);
 				glVertex3f(-0.5f, 0.5f, -0.5f);
+				glTexCoord2f(0.0f, 1.0f);
 				glVertex3f(-0.5f, -0.5f, -0.5f);
 				glEnd();
 			glPopMatrix();
@@ -147,9 +163,13 @@ namespace EasyGL {
 			glPushMatrix();
 				glNormal3f(0.0f, -1.0f, 0.0f);
 				glBegin(GL_QUADS);
+				glTexCoord2f(0.0f, 0.0f);
 				glVertex3f(0.5f, -0.5f, 0.5f);
+				glTexCoord2f(1.0f, 0.0f);
 				glVertex3f(-0.5f, -0.5f, 0.5f);
+				glTexCoord2f(1.0f, 1.0f);
 				glVertex3f(-0.5f, -0.5f, -0.5f);
+				glTexCoord2f(0.0f, 1.0f);
 				glVertex3f(0.5f, -0.5f, -0.5f);
 				glEnd();
 			glPopMatrix();
@@ -157,9 +177,13 @@ namespace EasyGL {
 			glPushMatrix();
 				glNormal3f(0.0f, 0.0f, -1.0f);
 				glBegin(GL_QUADS);
+				glTexCoord2f(0.0f, 0.0f);
 				glVertex3f(0.5f, 0.5f, -0.5f);
+				glTexCoord2f(1.0f, 0.0f);
 				glVertex3f(0.5f, -0.5f, -0.5f);
+				glTexCoord2f(1.0f, 1.0f);
 				glVertex3f(-0.5f, -0.5f, -0.5f);
+				glTexCoord2f(0.0f, 1.0f);
 				glVertex3f(-0.5f, 0.5f, -0.5f);
 				glEnd();
 			glPopMatrix();
@@ -176,13 +200,16 @@ namespace EasyGL {
 				glBegin(GL_QUAD_STRIP);
 				angle = 0.0;
 				while( angle < 2 * PI ) {
+					float tc = (angle / (float)(2 * PI));
 					x = radius * cos(angle);
 					z = radius * sin(angle);
 					v1 = Point3D(center.GetX() + x, center.GetY() + height, center.GetZ() + z);
 					v2 = Point3D(center.GetX() + x, center.GetY(), center.GetZ() + z);
 					AddNormal(v1 - center);
+					glTexCoord2f(tc, 0.0);
 					AddVertex(v1);
 					AddNormal(v2 - center);
+					glTexCoord2f(tc, 1.0);
 					AddVertex(v2);
 
 					angle = angle + 2 * PI / res;
@@ -190,8 +217,10 @@ namespace EasyGL {
 				v1 = Point3D(center.GetX() + x, center.GetY() + height, center.GetZ() + z);
 				v2 = Point3D(center.GetX() + x, center.GetY(), center.GetZ() + z);
 				AddNormal(v1 - center);
+				glTexCoord2f(0.0, 0.0);
 				AddVertex(v1);
 				AddNormal(v2 - center);
+				glTexCoord2f(0.0, 1.0);
 				AddVertex(v2);
 				glEnd();
 			glPopMatrix();
@@ -204,9 +233,11 @@ namespace EasyGL {
 				while( angle < 2 * PI ) {
 					x = radius * cos(angle);
 					z = radius * sin(angle);
+					glTexCoord2f(0.5f * cos(angle) + 0.5f, 0.5f * sin(angle) + 0.5f);
 					glVertex3d(x, height, z);
 					angle = angle + 2 * PI / res;
 				}
+				glTexCoord2f(0.5, 0.5);
 				glVertex3d(center.GetX() + radius, center.GetY() + height, center.GetZ());
 				glEnd();
 			glPopMatrix();
@@ -219,9 +250,11 @@ namespace EasyGL {
 				while (angle < 2 * PI) {
 					x = radius * cos(angle);
 					z = radius * sin(angle);
+					glTexCoord2f(0.5f * cos(angle) + 0.5f, 0.5f * sin(angle) + 0.5f);
 					glVertex3d(x, 0.0, z);
 					angle = angle + 2 * PI / res;
 				}
+				glTexCoord2f(0.5, 0.5);
 				glVertex3d(center.GetX() + radius, center.GetY() + height, center.GetZ());
 				glEnd();
 			glPopMatrix();

@@ -6,7 +6,6 @@
 #include "Observer.h"
 #include "GL/glut.h"
 #include "RgbImage.h"
-#include "Material.h"
 #include "Materials.h"
 
 using namespace EasyGL;
@@ -35,22 +34,65 @@ CYAN = Color(0.1, 0.9, 0.7, 1.0),
 OCEAN_BLUE = Color(0.3, 0.5, 1.0, 1.0);
 
 static vector<string> buttonLabels = { "1", "2", "3", "^", "+AC", "-AC", "4", "5", "6", "v", "X", "X", "7", "8", "9", "+b", "X", "X", "ON/OFF", "+v", "-v", "-b", "X", "X"};
+static GLfloat ambientLight[4] = { 0.3, 0.4,0.5, 1.0 };
 
-GLfloat ambientLight[4] = { 0.3, 0.4,0.5, 1.0 };   
+static GLint   r = 0;
+static GLint   g = 0;
+static GLint   b = 0;
+static GLfloat localLightPos[4] = { 0.0, 3.0, -6.0, 1.0 };
+static GLfloat localLightAmb[4] = { 0, 0, 0, 0.0 };
+static GLfloat localLightDif[4] = { r, g, b, 1.0 };
+static GLfloat localLightSpec[4] = { r, g, b, 1.0 };
 
-GLint   r = 1;  
-GLint   g = 1;
-GLint   b = 1;
-GLfloat localLightPos[4] = { 0.0, 5.0, 0.0, 1.0 };
-GLfloat localLightAmb[4] = { 0, 0, 0, 0.0 };
-GLfloat localLightDif[4] = { r, g, b, 1.0 };
-GLfloat localLightSpec[4] = { r, g, b, 1.0 };
+static GLuint textures[5];
 
 void DisplayText(string str, GLfloat x, GLfloat y, GLfloat z) {
     glRasterPos3f(x, y, z);
     int i = 0;
     while (str[i])
         glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, str[i++]);
+}
+
+
+void LoadTextures() {
+    glGenTextures(1, &textures[0]);
+    glBindTexture(GL_TEXTURE_2D, textures[0]);
+    img.LoadBmpFile("texture_floor.bmp");
+    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexImage2D(GL_TEXTURE_2D, 0, 3,
+        img.GetNumCols(),
+        img.GetNumRows(), 0, GL_RGB, GL_UNSIGNED_BYTE,
+        img.ImageData());
+
+    glGenTextures(1, &textures[1]);
+    glBindTexture(GL_TEXTURE_2D, textures[1]);
+    img.LoadBmpFile("texture_table.bmp");
+    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexImage2D(GL_TEXTURE_2D, 0, 3,
+        img.GetNumCols(),
+        img.GetNumRows(), 0, GL_RGB, GL_UNSIGNED_BYTE,
+        img.ImageData());
+
+    glGenTextures(1, &textures[2]);
+    glBindTexture(GL_TEXTURE_2D, textures[2]);
+    img.LoadBmpFile("texture_walls.bmp");
+    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexImage2D(GL_TEXTURE_2D, 0, 3,
+        img.GetNumCols(),
+        img.GetNumRows(), 0, GL_RGB, GL_UNSIGNED_BYTE,
+        img.ImageData());
 }
 
 void DisplayLights() {
@@ -61,6 +103,7 @@ void DisplayLights() {
     glLightfv(GL_LIGHT0, GL_SPECULAR, localLightSpec);
 }
 
+
 void Init() {
     gl.ClearColor(WHITE)
         .SetShadeModel(GL_SMOOTH)
@@ -68,25 +111,34 @@ void Init() {
         .Enable(GL_NORMALIZE)
         .Enable(GL_LIGHTING)
         .Enable(GL_LIGHT0)
-        .Enable(GL_LIGHT1);
+        .Disable(GL_BLEND);
 
+    LoadTextures();
     DisplayLights();
 
    vector<Color> colorChannels = { CYAN, YELLOW, RED, GREEN, BLUE, GREY, ORANGE, PINK, OCEAN_BLUE };
    tel.SetColorChannels(colorChannels);
+   tel.SetOffMaterial(MATERIAL_BLACK_PLASTIC);
+   tel.SetonMaterialr(MATERIAL_SILVER);
    world.GetFan().StartStop();
 }
 
 void DisplayWalls() {
     double ceilingHeight = 7.0;
 
-    Material::BindMaterial(MATERIAL_JADE);
+    Material::BindMaterial(MATERIAL_PEARL);
+    glEnable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, textures[1]);
     glPushMatrix();
         glNormal3d(1.0, 0.0, 0.0);
         glBegin(GL_QUADS);
+        glTexCoord2f(0.0f, 0.0f);
         glVertex3d(-10.0, 0.0, -10.0);
+        glTexCoord2f(1.0f, 0.0f);
         glVertex3d(-10.0, ceilingHeight, -10.0);
+        glTexCoord2f(1.0f, 1.0f);
         glVertex3d(-10.0, ceilingHeight, 11.0);
+        glTexCoord2f(0.0f, 1.0f);
         glVertex3d(-10.0, 0.0, 11.0);
         glEnd();
     glPopMatrix();
@@ -94,9 +146,13 @@ void DisplayWalls() {
     glPushMatrix();
         glNormal3d(-1.0, 0.0, 0.0);
         glBegin(GL_QUADS);
+        glTexCoord2f(0.0f, 0.0f);
         glVertex3d(11.0, 0.0, -10.0);
+        glTexCoord2f(1.0f, 0.0f);
         glVertex3d(11.0, ceilingHeight, -10.0);
+        glTexCoord2f(1.0f, 1.0f);
         glVertex3d(11.0, ceilingHeight, 11.0);
+        glTexCoord2f(0.0f, 1.0f);
         glVertex3d(11.0, 0.0, 11.0);
         glEnd();
     glPopMatrix();
@@ -104,9 +160,13 @@ void DisplayWalls() {
     glPushMatrix();
         glNormal3d(0.0, 0.0, 1.0);
         glBegin(GL_QUADS);
+        glTexCoord2f(0.0f, 0.0f);
         glVertex3d(-10.0, 0.0, -10.0);
+        glTexCoord2f(1.0f, 0.0f);
         glVertex3d(11.0, 0.0, -10.0);
+        glTexCoord2f(1.0f, 1.0f);
         glVertex3d(11.0, ceilingHeight, -10.0);
+        glTexCoord2f(0.0f, 1.0f);
         glVertex3d(-10.0, ceilingHeight, -10.0);
         glEnd();
     glPopMatrix();
@@ -114,28 +174,45 @@ void DisplayWalls() {
     glPushMatrix();
         glNormal3d(0.0, 0.0, -1.0);
         glBegin(GL_QUADS);
+        glTexCoord2f(0.0f, 0.0f);
         glVertex3d(-10.0, 0.0, 10.0);
+        glTexCoord2f(1.0f, 0.0f);
         glVertex3d(11.0, 0.0, 10.0);
+        glTexCoord2f(1.0f, 1.0f);
         glVertex3d(11.0, ceilingHeight, 10.0);
+        glTexCoord2f(0.0f, 1.0f);
         glVertex3d(-10.0, ceilingHeight, 10.0);
         glEnd();
     glPopMatrix();
+    glDisable(GL_TEXTURE_2D);
 
-    glPushMatrix();
-        glNormal3d(0.0, -1.0, 0.0);
-        glBegin(GL_QUADS);
-        glVertex3d(-10.0, ceilingHeight, 10.0);
-        glVertex3d(11.0, ceilingHeight, 10.0);
-        glVertex3d(11.0, ceilingHeight, -10.0);
-        glVertex3d(-10.0, ceilingHeight, -10.0);
-        glEnd();
-    glPopMatrix();
-    
+    glEnable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, textures[1]);
+    for (double x = -10; x <= 10; x++) {
+        for (double z = -10; z <= 10; z++) {
+            glPushMatrix();
+            glNormal3d(0, 1, 0);
+            glBegin(GL_QUADS);
+            glTexCoord2f(0.0f, 0.0f);
+            glVertex3d(x, ceilingHeight, z);
+            glTexCoord2f(1.0f, 0.0f);
+            glVertex3d(x, ceilingHeight, z + 1.0);
+            glTexCoord2f(1.0f, 1.0f);
+            glVertex3d(x + 1.0, ceilingHeight, z + 1.0);
+            glTexCoord2f(0.0f, 1.0f);
+            glVertex3d(x + 1.0, ceilingHeight, z);
+            glEnd();
+            glPopMatrix();
+        }
+    }
+    glDisable(GL_TEXTURE_2D);
 }
 
 void DisplayFloor() {
     bool materialFlag = true;
 
+    glEnable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, textures[0]);
     for (double x = -10; x <= 10; x++) {
         for (double z = -10; z <= 10; z++) {
             if (materialFlag) {
@@ -147,9 +224,13 @@ void DisplayFloor() {
             glPushMatrix();
                 glNormal3d(0, 1, 0);
                 glBegin(GL_QUADS);
+                glTexCoord2f(0.0f, 0.0f);
                 glVertex3d(x, 0, z);
+                glTexCoord2f(1.0f, 0.0f);
                 glVertex3d(x, 0, z + 1.0);
+                glTexCoord2f(1.0f, 1.0f);
                 glVertex3d(x + 1.0, 0, z + 1.0);
+                glTexCoord2f(0.0f, 1.0f);
                 glVertex3d(x + 1.0, 0, z);
                 glEnd();
             glPopMatrix();
@@ -157,17 +238,20 @@ void DisplayFloor() {
             materialFlag = !materialFlag;
         }
    }
+    glDisable(GL_TEXTURE_2D);
 }
 
 void DisplayTable() {
-    Material::BindMaterial(MATERIAL_COPPER);
     glPushMatrix();
+        glEnable(GL_TEXTURE_2D);
+        glBindTexture(GL_TEXTURE_2D, textures[1]);
         glTranslated(0.0, 0.325, -8.0);
         glPushMatrix();
             glScaled(4.0, 0.25, 3.0);
             glTranslated(0.0, 2.0, 0.0);
             gl.DrawCube();
         glPopMatrix();
+        glDisable(GL_TEXTURE_2D);
 
         glPushMatrix();
             glScaled(1.5, 1.25, 1.75);
@@ -175,18 +259,27 @@ void DisplayTable() {
             gl.DrawCube();
         glPopMatrix();
 
+        Material::BindMaterial(MATERIAL_BLACK_PLASTIC);
         glPushMatrix();
             glScaled(1.5, 1.5, 2.5);
             glTranslated(0.0, 1.0, 0.0);
             gl.DrawCube();
         glPopMatrix();
 
+        if (tel.IsOn()) {
+            Material::BindMaterial(tel.GetOnMaterial());
+        }
+        else {
+            Material::BindMaterial(tel.GetOffMaterial());
+        }
         glPushMatrix();
         glScaled(1.25, 1.25, 2.25);
-        glTranslated(0.0, 1.0 + 0.25, -0.10);
+        glTranslated(0.0, 1.0 + 0.25, 0.1);
         gl.DrawSquare();
         glPopMatrix();
 
+        glEnable(GL_TEXTURE_2D);
+        glBindTexture(GL_TEXTURE_2D, textures[1]);
         glPushMatrix();
             glScaled(0.1, 1 - 0.25, 0.1);
             glPushMatrix();
@@ -206,11 +299,22 @@ void DisplayTable() {
                 gl.DrawCube();
             glPopMatrix();
         glPopMatrix();
+        glDisable(GL_TEXTURE_2D);
     glPopMatrix();
 }
 
 bool IsChannelButton(int b) {
     return 0 <= b && b <= 2 || 6 <= b && b <= 8 || 12 <= b && b <= 14;
+}
+
+void UpdateTVLight() {
+    localLightDif[0] = tel.GetBrightness();
+    localLightDif[1] = tel.GetBrightness();
+    localLightDif[2] = tel.GetBrightness();
+    localLightSpec[0] = tel.GetBrightness();
+    localLightSpec[1] = tel.GetBrightness();
+    localLightSpec[2] = tel.GetBrightness();
+    glLightfv(GL_LIGHT0, GL_DIFFUSE, localLightDif);
 }
 
 void HandleButton(int i) {
@@ -232,6 +336,7 @@ void HandleButton(int i) {
         break;
     case 18:
         tel.TurnOnOff();
+        UpdateTVLight();
         break;
     case 19:
         tel.IncVolume();
@@ -250,6 +355,16 @@ void HandleButton(int i) {
         break;
     case 5:
         fan.DecVelocity();
+        break;
+    case 10:
+        tel.SetBrightness(tel.GetBrightness() + 0.01);
+        UpdateTVLight();
+        break;
+    case 11:
+        tel.SetBrightness(tel.GetBrightness() - 0.01);
+        UpdateTVLight();
+    default:
+        break;
     };
 }
 

@@ -1,7 +1,8 @@
 #ifndef TVREMOTECONTROLLER_TELEVISION_H
 #define TVREMOTECONTROLLER_TELEVISION_H
-#include "Color.h"
+
 #include <vector>
+#include "Material.h"
 
 using namespace std;
 
@@ -11,14 +12,26 @@ private:
 	int channel;
 	int numChannels;
 	int volume;
+	double brightness;
 	vector<Color> colorChannels;
 	Color offColor;
+	Material offMaterial;
+	Material onMaterial;
 public:
 	Television() {
+	}
 
+	Television(Material offMaterial, Material onMaterial) {
+		brightness = 0.0;
+		this->offMaterial = offMaterial;
+		this->onMaterial = onMaterial;
 	}
 
 	~Television() {
+	}
+
+	bool IsOn() {
+		return on;
 	}
 
 	Color GetChannel() {
@@ -33,8 +46,26 @@ public:
 		return volume;
 	}
 
+	double GetBrightness() {
+		return brightness;
+	}
+
+	Material GetOffMaterial() {
+		return offMaterial;
+	}
+
+	Material GetOnMaterial() {
+		return onMaterial;
+	}
+
 	Television& TurnOnOff() {
 		on = !on;
+
+		if (on) {
+			brightness = 1.0;
+		} else {
+			brightness = 0.0;
+		}
 
 		return *this;
 	}
@@ -88,6 +119,26 @@ public:
 
 	Television& SetOffColor(Color offColor) {
 		this->offColor = offColor;
+
+		return *this;
+	}
+
+	Television& SetOffMaterial(Material offMaterial) {
+		this->offMaterial = offMaterial;
+
+		return *this;
+	}
+
+	Television& SetonMaterialr(Material onMaterial) {
+		this->onMaterial = onMaterial;
+
+		return *this;
+	}
+
+	Television& SetBrightness(double brightness) {
+		if (on && 0.0 < brightness && brightness <= 1.0) {
+			this->brightness = brightness;
+		}
 
 		return *this;
 	}

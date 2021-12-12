@@ -87,6 +87,62 @@ void Init() {
    world.GetFan().StartStop();
 }
 
+void DisplayWalls() {
+    double ceilingHeight = 7.0;
+
+    Material::BindMaterial(MATERIAL_JADE);
+    glPushMatrix();
+        glNormal3d(1.0, 0.0, 0.0);
+        glBegin(GL_QUADS);
+        glVertex3d(-10.0, 0.0, -10.0);
+        glVertex3d(-10.0, ceilingHeight, -10.0);
+        glVertex3d(-10.0, ceilingHeight, 11.0);
+        glVertex3d(-10.0, 0.0, 11.0);
+        glEnd();
+    glPopMatrix();
+
+    glPushMatrix();
+        glNormal3d(-1.0, 0.0, 0.0);
+        glBegin(GL_QUADS);
+        glVertex3d(11.0, 0.0, -10.0);
+        glVertex3d(11.0, ceilingHeight, -10.0);
+        glVertex3d(11.0, ceilingHeight, 11.0);
+        glVertex3d(11.0, 0.0, 11.0);
+        glEnd();
+    glPopMatrix();
+
+    glPushMatrix();
+        glNormal3d(0.0, 0.0, 1.0);
+        glBegin(GL_QUADS);
+        glVertex3d(-10.0, 0.0, -10.0);
+        glVertex3d(11.0, 0.0, -10.0);
+        glVertex3d(11.0, ceilingHeight, -10.0);
+        glVertex3d(-10.0, ceilingHeight, -10.0);
+        glEnd();
+    glPopMatrix();
+
+    glPushMatrix();
+        glNormal3d(0.0, 0.0, -1.0);
+        glBegin(GL_QUADS);
+        glVertex3d(-10.0, 0.0, 10.0);
+        glVertex3d(11.0, 0.0, 10.0);
+        glVertex3d(11.0, ceilingHeight, 10.0);
+        glVertex3d(-10.0, ceilingHeight, 10.0);
+        glEnd();
+    glPopMatrix();
+
+    glPushMatrix();
+        glNormal3d(0.0, -1.0, 0.0);
+        glBegin(GL_QUADS);
+        glVertex3d(-10.0, ceilingHeight, 10.0);
+        glVertex3d(11.0, ceilingHeight, 10.0);
+        glVertex3d(11.0, ceilingHeight, -10.0);
+        glVertex3d(-10.0, ceilingHeight, -10.0);
+        glEnd();
+    glPopMatrix();
+    
+}
+
 void DisplayFloor() {
     bool materialFlag = true;
 
@@ -216,7 +272,7 @@ void DisplayController() {
     glPushMatrix();
         glTranslated(target.GetX(), target.GetY(), target.GetZ() + 2);
         glPushMatrix();
-            glScaled(0.8, 0.125, 3);
+            glScaled(0.8, 0.175, 3);
             gl.DrawCube();
         glPopMatrix();
 
@@ -243,19 +299,18 @@ void DisplayController() {
                 }
 
                 glPushMatrix();
-                Material::BindMaterial(MATERIAL_WHITE_PLASTIC);
-                    glTranslated(x + 0.05, -buttonAmp, z + 0.05);
+                    glTranslated(x + 0.05, -buttonAmp + 0.02, z + 0.05);
                     if (ctrl.GetSelectedButton() == button) {
-                        //gl.SetColor(GREEN);
-                    }
-                    else {
-                        //gl.SetColor(RED);
+                        Material::BindMaterial(MATERIAL_JADE);
+                    } else {
+                        Material::BindMaterial(MATERIAL_WHITE_PLASTIC);
                     }
 
-                    gl.DrawCylinder(0.05, 0.05);
-                    //gl.SetColor(WHITE);
+                    glScaled(0.06, 0.06, 0.06);
+                    glRotated(90, 1.0, 0.0, 0.0);
+                    glutSolidDodecahedron();
                     glPushMatrix();
-                        glScaled(0.1, 0.1, 0.1);
+                        Material::BindMaterial(MATERIAL_BLACK_PLASTIC);
                         DisplayText(buttonLabels[button], 0, 0, 0);
                     glPopMatrix();
                 glPopMatrix();
@@ -279,34 +334,38 @@ void DisplayFan() {
         glRotated(-45, 0.0, 1.0, 0.0);
         glPushMatrix();
             glScaled(0.25, 4.0, 0.25);
-            //gl.SetColor(GREEN);
+            Material::BindMaterial(MATERIAL_SILVER);
             gl.DrawCube();
         glPopMatrix();
         glPushMatrix();
         glTranslated(0.0, 2.0, 0.0);
-            //gl.SetColor(RED);
+            Material::BindMaterial(MATERIAL_SILVER);
             glPushMatrix();
                 glRotated(90.0, 1.0, 0.0, 0.0);
                 gl.DrawCylinder(1, 0.5);
             glPopMatrix();
 
-            //gl.SetColor(YELLOW);
+            Material::BindMaterial(MATERIAL_WHITE_PLASTIC);
             glPushMatrix();
                 glRotated(90.0, 1.0, 0.0, 0.0);
                 gl.DrawCylinder(0.75, 0.2);
             glPopMatrix();
 
             glPushMatrix();
-                glRotated(fan.GetAngle(), 0.0, 0.0, 1.0);
-                glScaled(1.0, 0.1, 1.0);
-                gl.DrawSquare();
-            glPopMatrix();
+                glTranslated(0.0, 0.0, 0.1);
+                glPushMatrix();
+                    Material::BindMaterial(MATERIAL_WHITE_PLASTIC);
+                    glRotated(fan.GetAngle(), 0.0, 0.0, 1.0);
+                    glScaled(1.0, 0.1, 1.0);
+                    gl.DrawSquare();
+                glPopMatrix();
 
-            //gl.SetColor(BLACK);
-            glPushMatrix();
-            glRotated(fan.GetAngle() + 90, 0.0, 0.0, 1.0);
-            glScaled(1.0, 0.1, 1.0);
-            gl.DrawSquare();
+                glPushMatrix();
+                    Material::BindMaterial(MATERIAL_WHITE_PLASTIC);
+                    glRotated(fan.GetAngle() + 90, 0.0, 0.0, 1.0);
+                    glScaled(1.0, 0.1, 1.0);
+                    gl.DrawSquare();
+                glPopMatrix();
             glPopMatrix();
         glPopMatrix();
     glPopMatrix();
@@ -322,6 +381,7 @@ void DisplayFunc() {
 
     DisplayLights();
     DisplayFloor();
+    DisplayWalls();
     DisplayTable();
     DisplayController();
     DisplayFan();

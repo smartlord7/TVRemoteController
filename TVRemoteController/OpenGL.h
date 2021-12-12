@@ -172,65 +172,73 @@ namespace EasyGL {
 			Point3D v1, v2;
 
             /** Draw the tube */
-            glBegin(GL_QUAD_STRIP);
-            angle = 0.0;
-            while( angle < 2 * PI ) {
-                x = radius * cos(angle);
-                z = radius * sin(angle);
+			glPushMatrix();
+				glBegin(GL_QUAD_STRIP);
+				angle = 0.0;
+				while( angle < 2 * PI ) {
+					x = radius * cos(angle);
+					z = radius * sin(angle);
+					v1 = Point3D(center.GetX() + x, center.GetY() + height, center.GetZ() + z);
+					v2 = Point3D(center.GetX() + x, center.GetY(), center.GetZ() + z);
+					AddNormal(v1 - center);
+					AddVertex(v1);
+					AddNormal(v2 - center);
+					AddVertex(v2);
+
+					angle = angle + 2 * PI / res;
+				}
 				v1 = Point3D(center.GetX() + x, center.GetY() + height, center.GetZ() + z);
 				v2 = Point3D(center.GetX() + x, center.GetY(), center.GetZ() + z);
-				AddVertex(v1);
 				AddNormal(v1 - center);
-				AddVertex(v2);
+				AddVertex(v1);
 				AddNormal(v2 - center);
-
-                angle = angle + 2 * PI / res;
-            }
-			v1 = Point3D(center.GetX() + x, center.GetY() + height, center.GetZ() + z);
-			v2 = Point3D(center.GetX() + x, center.GetY(), center.GetZ() + z);
-			AddVertex(v1);
-			AddNormal(v1 - center);
-			AddVertex(v2);
-			AddNormal(v2 - center);
-            glEnd();
+				AddVertex(v2);
+				glEnd();
+			glPopMatrix();
 
             /** Draw the circle on top of cylinder */
-            glBegin(GL_POLYGON);
-            angle = 0.0;
-            while( angle < 2 * PI ) {
-                x = radius * cos(angle);
-                z = radius * sin(angle);
+			glPushMatrix();
 				glNormal3d(0.0, 0.0, 1.0);
-                glVertex3d(x, height, z);
-                angle = angle + 2 * PI / res;
-            }
-            glVertex3d(center.GetX() + radius, center.GetY() + height, center.GetZ());
-            glEnd();
+				glBegin(GL_POLYGON);
+				angle = 0.0;
+				while( angle < 2 * PI ) {
+					x = radius * cos(angle);
+					z = radius * sin(angle);
+					glVertex3d(x, height, z);
+					angle = angle + 2 * PI / res;
+				}
+				glVertex3d(center.GetX() + radius, center.GetY() + height, center.GetZ());
+				glEnd();
+			glPopMatrix();
 
 			/** Draw the circle on bottom of cylinder */
-			glBegin(GL_POLYGON);
-			angle = 0.0;
-			while (angle < 2 * PI) {
-				x = radius * cos(angle);
-				z = radius * sin(angle);
+			glPushMatrix();
 				glNormal3d(0.0, 0.0, -1.0);
-				glVertex3d(x, 0.0, z);
-				angle = angle + 2 * PI / res;
-			}
-			glVertex3d(center.GetX() + radius, center.GetY() + height, center.GetZ());
-			glEnd();
+				glBegin(GL_POLYGON);
+				angle = 0.0;
+				while (angle < 2 * PI) {
+					x = radius * cos(angle);
+					z = radius * sin(angle);
+					glVertex3d(x, 0.0, z);
+					angle = angle + 2 * PI / res;
+				}
+				glVertex3d(center.GetX() + radius, center.GetY() + height, center.GetZ());
+				glEnd();
+			glPopMatrix();
 
             return *this;
         }
 
 		OpenGL& DrawSquare() {
-			glBegin(GL_QUADS);
-			glNormal3f(0.0f, 0.0f, 1.0f);
-			glVertex3f(0.5f, -0.5f, 0.5f);
-			glVertex3f(0.5f, 0.5f, 0.5f);
-			glVertex3f(-0.5f, 0.5f, 0.5f);
-			glVertex3f(-0.5f, -0.5f, 0.5f);
-			glEnd();
+			glPushMatrix();
+				glNormal3f(0.0f, 0.0f, 1.0f);
+				glBegin(GL_QUADS);
+				glVertex3f(0.5f, -0.5f, 0.5f);
+				glVertex3f(0.5f, 0.5f, 0.5f);
+				glVertex3f(-0.5f, 0.5f, 0.5f);
+				glVertex3f(-0.5f, -0.5f, 0.5f);
+				glEnd();
+			glPopMatrix();
 
 			return *this;
 		}

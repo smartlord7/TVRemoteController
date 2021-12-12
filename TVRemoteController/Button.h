@@ -15,8 +15,8 @@ private:
 
 public:
     static const int global_id = 0;
-    static double constexpr BUTTON_DEFAULT_MAX_AMPLITUDE = 0.05;
-    static double constexpr BUTTON_DEFAULT_VELOCITY = 0.01;
+    static double constexpr BUTTON_DEFAULT_MAX_AMPLITUDE = 0.03;
+    static double constexpr BUTTON_DEFAULT_VELOCITY = 0.005;
 
     Button(int id, string label) {
         handled = false;

@@ -53,46 +53,26 @@ void DisplayText(string str, GLfloat x, GLfloat y, GLfloat z) {
         glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, str[i++]);
 }
 
+void LoadTexture(const char * fileName, GLuint * textureId) {
+    glGenTextures(1, textureId);
+    glBindTexture(GL_TEXTURE_2D, * textureId);
+    img.LoadBmpFile(fileName);
+    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexImage2D(GL_TEXTURE_2D, 0, 3,
+        img.GetNumCols(),
+        img.GetNumRows(), 0, GL_RGB, GL_UNSIGNED_BYTE,
+        img.ImageData());
+}
+
 
 void LoadTextures() {
-    glGenTextures(1, &textures[0]);
-    glBindTexture(GL_TEXTURE_2D, textures[0]);
-    img.LoadBmpFile("texture_floor.bmp");
-    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexImage2D(GL_TEXTURE_2D, 0, 3,
-        img.GetNumCols(),
-        img.GetNumRows(), 0, GL_RGB, GL_UNSIGNED_BYTE,
-        img.ImageData());
-
-    glGenTextures(1, &textures[1]);
-    glBindTexture(GL_TEXTURE_2D, textures[1]);
-    img.LoadBmpFile("texture_table.bmp");
-    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexImage2D(GL_TEXTURE_2D, 0, 3,
-        img.GetNumCols(),
-        img.GetNumRows(), 0, GL_RGB, GL_UNSIGNED_BYTE,
-        img.ImageData());
-
-    glGenTextures(1, &textures[2]);
-    glBindTexture(GL_TEXTURE_2D, textures[2]);
-    img.LoadBmpFile("texture_walls.bmp");
-    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexImage2D(GL_TEXTURE_2D, 0, 3,
-        img.GetNumCols(),
-        img.GetNumRows(), 0, GL_RGB, GL_UNSIGNED_BYTE,
-        img.ImageData());
+    LoadTexture("texture_floor.bmp", &textures[0]);
+    LoadTexture("texture_table.bmp", &textures[1]);
+    LoadTexture("texture_walls.bmp", &textures[2]);
 }
 
 void DisplayLights() {
@@ -260,6 +240,8 @@ void DisplayTable() {
         glPopMatrix();
 
         Material::BindMaterial(MATERIAL_BLACK_PLASTIC);
+        glEnable(GL_TEXTURE_2D);
+        glBindTexture(GL_TEXTURE_2D, textures[1]);
         glPushMatrix();
             glScaled(1.5, 1.5, 2.5);
             glTranslated(0.0, 1.0, 0.0);
@@ -268,15 +250,23 @@ void DisplayTable() {
 
         if (tel.IsOn()) {
             Material::BindMaterial(tel.GetOnMaterial());
-        }
-        else {
+            glEnable(GL_TEXTURE_2D);
+            glBindTexture(GL_TEXTURE_2D, textures[CHANNELS_TEXTURES_OFFSET + tel.GetChannel()]);
+            glPushMatrix();
+                glScaled(1.25, 1.25, 2.25);
+                glTranslated(0.0, 1.0 + 0.25, 0.1);
+                gl.DrawSquare();
+            glPopMatrix();
+            glDisable(GL_TEXTURE_2D);
+
+        } else {
             Material::BindMaterial(tel.GetOffMaterial());
+            glPushMatrix();
+                glScaled(1.25, 1.25, 2.25);
+                glTranslated(0.0, 1.0 + 0.25, 0.1);
+                gl.DrawSquare();
+            glPopMatrix();
         }
-        glPushMatrix();
-        glScaled(1.25, 1.25, 2.25);
-        glTranslated(0.0, 1.0 + 0.25, 0.1);
-        gl.DrawSquare();
-        glPopMatrix();
 
         glEnable(GL_TEXTURE_2D);
         glBindTexture(GL_TEXTURE_2D, textures[1]);

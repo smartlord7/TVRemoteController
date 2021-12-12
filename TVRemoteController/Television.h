@@ -34,12 +34,16 @@ public:
 		return on;
 	}
 
-	Color GetChannel() {
+	Color GetColorChannel() {
 		if (on) {
 			return colorChannels[channel];
 		} else {
 			return offColor;
 		}
+	}
+
+	int GetChannel() {
+		return channel;
 	}
 
 	int GetVolume() {

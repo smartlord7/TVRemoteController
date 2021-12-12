@@ -11,6 +11,7 @@ using namespace Geometry;
 
 //#region GLWindow Parameters
 
+const int CHANNELS_TEXTURES_OFFSET = 3;
 const int DISPLAY_MODE = GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH;
 const double WIN_POS_X = 0,
     WIN_POS_Y = 0;

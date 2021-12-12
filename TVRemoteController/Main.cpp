@@ -36,16 +36,15 @@ OCEAN_BLUE = Color(0.3, 0.5, 1.0, 1.0);
 
 static vector<string> buttonLabels = { "1", "2", "3", "^", "+AC", "-AC", "4", "5", "6", "v", "X", "X", "7", "8", "9", "+b", "X", "X", "ON/OFF", "+v", "-v", "-b", "X", "X"};
 
-GLfloat luzGlobalCorAmb[4] = { 0.3, 0.4,0.5, 1.0 };   // 
+GLfloat ambientLight[4] = { 0.3, 0.4,0.5, 1.0 };   
 
-GLint   luzR = 1;		 	 //:::   'R'  
-GLint   luzG = 1;			 //:::   'G'  
-GLint   luzB = 1;			 //:::   'B'  
-GLfloat localPos[4] = { 0.0, 5.0, 0.0, 1.0 };
-GLfloat localCorAmb[4] = { 0, 0, 0, 0.0 };
-GLfloat localCorDif[4] = { luzR, luzG, luzB, 1.0 };
-GLfloat localCorEsp[4] = { luzR, luzG, luzB, 1.0 };
-
+GLint   r = 1;  
+GLint   g = 1;
+GLint   b = 1;
+GLfloat localLightPos[4] = { 0.0, 5.0, 0.0, 1.0 };
+GLfloat localLightAmb[4] = { 0, 0, 0, 0.0 };
+GLfloat localLightDif[4] = { r, g, b, 1.0 };
+GLfloat localLightSpec[4] = { r, g, b, 1.0 };
 
 void DisplayText(string str, GLfloat x, GLfloat y, GLfloat z) {
     glRasterPos3f(x, y, z);
@@ -54,22 +53,12 @@ void DisplayText(string str, GLfloat x, GLfloat y, GLfloat z) {
         glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, str[i++]);
 }
 
-void InitLights() {
-    glLightModelfv(GL_LIGHT_MODEL_AMBIENT, luzGlobalCorAmb);
-
-    glLightfv(GL_LIGHT0, GL_POSITION, localPos);
-    glLightfv(GL_LIGHT0, GL_AMBIENT, localCorAmb);
-    glLightfv(GL_LIGHT0, GL_DIFFUSE, localCorDif);
-    glLightfv(GL_LIGHT0, GL_SPECULAR, localCorEsp);
-  
-}
-
 void DisplayLights() {
-    glLightModelfv(GL_LIGHT_MODEL_AMBIENT, luzGlobalCorAmb);
-    glLightfv(GL_LIGHT0, GL_POSITION, localPos);
-    glLightfv(GL_LIGHT0, GL_AMBIENT, localCorAmb);
-    glLightfv(GL_LIGHT0, GL_DIFFUSE, localCorDif);
-    glLightfv(GL_LIGHT0, GL_SPECULAR, localCorEsp);
+    glLightModelfv(GL_LIGHT_MODEL_AMBIENT, ambientLight);
+    glLightfv(GL_LIGHT0, GL_POSITION, localLightPos);
+    glLightfv(GL_LIGHT0, GL_AMBIENT, localLightAmb);
+    glLightfv(GL_LIGHT0, GL_DIFFUSE, localLightDif);
+    glLightfv(GL_LIGHT0, GL_SPECULAR, localLightSpec);
 }
 
 void Init() {
@@ -78,9 +67,10 @@ void Init() {
         .Enable(GL_DEPTH_TEST)
         .Enable(GL_NORMALIZE)
         .Enable(GL_LIGHTING)
-        .Enable(GL_LIGHT0);
+        .Enable(GL_LIGHT0)
+        .Enable(GL_LIGHT1);
 
-    InitLights();
+    DisplayLights();
 
    vector<Color> colorChannels = { CYAN, YELLOW, RED, GREEN, BLUE, GREY, ORANGE, PINK, OCEAN_BLUE };
    tel.SetColorChannels(colorChannels);
@@ -274,6 +264,13 @@ void DisplayController() {
         glPushMatrix();
             glScaled(0.8, 0.175, 3);
             gl.DrawCube();
+        glPopMatrix();
+
+        Material::BindMaterial(MATERIAL_WHITE_PLASTIC);
+        glPushMatrix();
+            glScaled(0.10, 0.08, 0.10);
+            glTranslated(0.0, 0.0, 15.0);
+            glutSolidSphere(1.0, 30, 30);
         glPopMatrix();
 
         for (x = -0.35; x <= 0.35; x += 0.2) {

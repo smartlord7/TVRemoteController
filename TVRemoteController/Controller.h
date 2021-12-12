@@ -11,7 +11,6 @@ class Controller {
 private:
 	vector<Button> buttons;
 	int selectedButton;
-	set<int> pressedButtons;
 	int latestPressedButton;
 	int rows;
 	int cols;
@@ -23,16 +22,12 @@ public:
 	~Controller() {
 	}
 
-	vector<Button> GetButtons() {
+	vector<Button>& GetButtons() {
 		return buttons;
 	}
 
 	int GetSelectedButton() {
 		return selectedButton;
-	}
-
-	set<int> GetPressedButtons() {
-		return pressedButtons;
 	}
 
 	int GetRows() {
@@ -43,11 +38,11 @@ public:
 		return cols;
 	}
 
-	Controller& InitButtons(int rows, int cols) {
+	Controller& InitButtons(int rows, int cols, vector<string> labels) {
 		this->rows = rows;
 		this->cols = cols;
 		for (int i = 0; i < rows * cols; i++) {
-			buttons.push_back(Button());
+			buttons.push_back(Button(i, labels[i]));
 		}
 
 		return *this;
@@ -55,7 +50,7 @@ public:
 
 	Controller& PressSelectedButton() {
 		buttons[selectedButton].Press();
-		pressedButtons.insert(selectedButton);
+		buttons[selectedButton].SetHandled(false);
 		latestPressedButton = selectedButton;
 
 		return *this;
@@ -71,10 +66,7 @@ public:
 		int i = 0;
 
 		for (; i < buttons.size(); i++) {
-			if (!buttons[i].Update(time) && pressedButtons.count(i)) {
-				pressedButtons.erase(i);
-				break;
-			}
+			buttons[i].Update(time);
 		}
 
 		return *this;

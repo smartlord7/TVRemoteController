@@ -9,16 +9,22 @@ private:
 	double maxAmplitude;
     double velocity;
     bool handled;
+    int id;
+    string label;
+
 public:
+    static const int global_id = 0;
     static double constexpr BUTTON_DEFAULT_MAX_AMPLITUDE = 0.05;
     static double constexpr BUTTON_DEFAULT_VELOCITY = 0.01;
 
-    Button() {
+    Button(int id, string label) {
         handled = false;
         state = ButtonState::BUTTON_STATE_NORMAL;
         amplitude = 0;
         maxAmplitude = BUTTON_DEFAULT_MAX_AMPLITUDE;
         velocity = BUTTON_DEFAULT_VELOCITY;
+        this->id = id;
+        this->label = label;
     }
 
     ~Button() {
@@ -44,6 +50,14 @@ public:
         return handled;
     }
 
+    int GetId() {
+        return id;
+    }
+
+    string GetLabel() {
+        return label;
+    }
+
     Button& SetMaxAmplitude(double maxAmplitude) {
         this->maxAmplitude = maxAmplitude;
 
@@ -52,6 +66,18 @@ public:
 
     Button& SetHandled(bool handled) {
         this->handled = handled;
+
+        return *this;
+    }
+
+    Button& SetId(int id) {
+        this->id = id;
+        
+        return *this;
+    }
+
+    Button& SetLabel(string label) {
+        this->label = label;
 
         return *this;
     }
@@ -70,9 +96,9 @@ public:
                 amplitude += time * velocity;
             } else if (amplitude >= maxAmplitude && state == ButtonState::BUTTON_STATE_PRESSED) {
                 state = ButtonState::BUTTON_STATE_BACK;
-            } else if (amplitude >= 0 && state == ButtonState::BUTTON_STATE_BACK) {
+            } else if (amplitude > 0 && state == ButtonState::BUTTON_STATE_BACK) {
                 amplitude -= time * velocity;
-            } else if (amplitude < 0 && state == ButtonState::BUTTON_STATE_BACK) {
+            } else if (amplitude <= 0 && state == ButtonState::BUTTON_STATE_BACK) {
                 state = ButtonState::BUTTON_STATE_NORMAL;
 
                 return false;
@@ -83,6 +109,10 @@ public:
         else {
             return false;
         }
+    }
+
+    bool IsInAnimation() {
+        return state == ButtonState::BUTTON_STATE_PRESSED || state == ButtonState::BUTTON_STATE_BACK;
     }
 };
 

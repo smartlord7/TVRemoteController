@@ -20,7 +20,7 @@ static Television& tel = world.GetTelevision();
 static bool firstRun = true;
 static RgbImage img;
 
-Color BLACK = Color(0.0, 0.0, 0.0, 1.0),
+static Color BLACK = Color(0.0, 0.0, 0.0, 1.0),
 WHITE = Color(1.0, 1.0, 1.0, 1.0),
 YELLOW = Color(1.0, 1.0, 0.0, 1.0),
 RED = Color(1.0, 0.0, 0.0, 1.0),
@@ -28,10 +28,11 @@ GREEN = Color(0.0, 1.0, 0.0, 1.0),
 BLUE = Color(0.0, 0.0, 1.0, 1.0),
 GREY = Color(0.86, 0.86, 0.86, 1.0),
 ORANGE = Color(0.9, 0.4, 0.0, 1.0),
-PINK = Color(0.9, 0.1, 0.2, 1.0);
+PINK = Color(0.9, 0.1, 0.2, 1.0),
+CYAN = Color(0.1, 0.9, 0.7, 1.0),
+OCEAN_BLUE = Color(0.3, 0.5, 1.0, 1.0);
 
-Color tvColors[] = { BLACK, YELLOW, RED, GREEN, BLUE, GREY, ORANGE, PINK };
-
+static vector<string> buttonLabels = { "1", "2", "3", "^", "+AC", "-AC", "4", "5", "6", "v", "X", "X", "7", "8", "9", "+b", "X", "X", "ON/OFF", "+v", "-v", "-b", "X", "X"};
 static float vertexes[] = {
         1.0f,1.0f,1.0f,   -1.0f,1.0f,1.0f,   -1.0f,-1.0f,1.0f,   1.0f,-1.0f,1.0f,      // face #1
         1.0f,1.0f,1.0f,    1.0f,-1.0f,1.0f,   1.0f,-1.0f,-1.0f,  1.0f,1.0f,-1.0f,      // face #2
@@ -40,14 +41,6 @@ static float vertexes[] = {
        -1.0f,-1.0f,-1.0f, -1.0f,-1.0f,1.0f,  -1.0f,1.0f,1.0f,   -1.0f,1.0f,-1.0f,      // face #5
        -1.0f,-1.0f,-1.0f,  1.0f,-1.0f,-1.0f,  1.0f,-1.0f,1.0f,  -1.0f,-1.0f,1.0f      // face #6
 };
-
-static float colors[] = {
-        1,0,0,  1,0,0,  1,0,0,  1,0,0,      // face #1 is red
-        0,1,0,  0,1,0,  0,1,0,  0,1,0,      // face #2 is green
-        0,0,1,  0,0,1,  0,0,1,  0,0,1,      // face #3 is blue
-        1,1,0,  1,1,0,  1,1,0,  1,1,0,      // face #4 is yellow
-        0,1,1,  0,1,1,  0,1,1,  0,1,1,      // face #5 is cyan
-        1,0,1,  1,0,1,  1,0,1,  1,0,1, }; // face #6 is red
 
 float normals[] = {
     -1.0f, 0.0f, 0.0f,
@@ -101,10 +94,11 @@ void InitLights() {
     glLightfv(GL_LIGHT0, GL_QUADRATIC_ATTENUATION, &LAttenuationQuadrat);
 }
 
-void DisplayText(char* string, GLfloat x, GLfloat y, GLfloat z) {
+void DisplayText(string str, GLfloat x, GLfloat y, GLfloat z) {
     glRasterPos3f(x, y, z);
-    while (*string)
-        glutBitmapCharacter(GLUT_BITMAP_HELVETICA_10, *string++);
+    int i = 0;
+    while (str[i])
+        glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, str[i++]);
 }
 
 void LoadTextures() {
@@ -138,6 +132,11 @@ void Init() {
     glTexCoordPointer(2, GL_FLOAT, 0, texturesCoordes);
     LoadTextures();
     InitLights();
+
+   vector<Color> colorChannels = { CYAN, YELLOW, RED, GREEN, BLUE, GREY, ORANGE, PINK, OCEAN_BLUE };
+   tel.SetColorChannels(colorChannels);
+   world.GetFan().StartStop();
+
 }
 
 void DisplayFloor() {
@@ -197,7 +196,7 @@ void DisplayTable() {
             gl.DrawCube();
         glPopMatrix();
 
-        gl.SetColor(tel.GetColor());
+        gl.SetColor(tel.GetChannel());
         glPushMatrix();
         glScaled(1.25, 1.25, 2.25);
         glTranslated(0.0, 1.0 + 0.25, -0.10);
@@ -227,32 +226,52 @@ void DisplayTable() {
     glPopMatrix();
 }
 
+bool IsChannelButton(int b) {
+    return 0 <= b && b <= 2 || 6 <= b && b <= 8 || 12 <= b && b <= 14;
+}
+
 void HandleButton(int i) {
-    cout << i << "\n";
     switch (i) {
     case 0:
     case 1:
     case 2:
-        tel.SetColor(tvColors[i]);
+        tel.SetChannel(i);
         break;
     case 6:
     case 7:
     case 8:
-        tel.SetColor(tvColors[i - 3]);
+        tel.SetChannel(i - 3);
         break;
     case 12:
     case 13:
     case 14:
+        tel.SetChannel(i - 6);
         break;
-        tel.SetColor(tvColors[i - 6]);
+    case 18:
+        tel.TurnOnOff();
+        break;
+    case 19:
+        tel.IncVolume();
+        break;
+    case 20:
+        tel.DecVolume();
+        break;
+    case 3:
+        tel.IncChannel();
+        break;
+    case 9:
+        tel.DecChannel();
+        break;
+    case 4:
+        fan.IncVelocity();
+        break;
+    case 5:
+        fan.DecVelocity();
     };
-
-    ctrl.GetButtons()[i].SetHandled(true);
 }
 
 void DisplayController() {
     Point3D target = obs.GetTarget();
-    Button btn;
     double x, z, buttonAmp = 0;
     int rows = 0, cols = 0, button = 0;
 
@@ -269,37 +288,48 @@ void DisplayController() {
                 if (rows == 0) {
                     cols++;
                 }
-
-                if (ctrl.GetSelectedButton() == button) {
-                    gl.SetColor(GREEN);
-                } else {
-                    gl.SetColor(RED);
-                }
                   
+                if (!firstRun) {
+                    Button& btn = ctrl.GetButtons()[button];
+
+                    if (btn.IsInAnimation()) {
+                        buttonAmp = ctrl.GetButtons()[button].GetAmplitude();
+
+                        if (!btn.IsHandled()) {
+                            HandleButton(button);
+                            btn.SetHandled(true);
+                        }
+                    }
+                    else {
+                        buttonAmp = 0;
+                    }
+                }
+
                 glPushMatrix();
+                    glTranslated(x + 0.05, -buttonAmp, z + 0.05);
+                    if (ctrl.GetSelectedButton() == button) {
+                        gl.SetColor(GREEN);
+                    }
+                    else {
+                        gl.SetColor(RED);
+                    }
 
-
-                if (ctrl.GetPressedButtons().count(button)) {
-                    btn = ctrl.GetButtons()[button];
-
-                    buttonAmp = ctrl.GetButtons()[button].GetAmplitude();
-                    HandleButton(button);
-                }
-                else {
-                    buttonAmp = 0;
-                }
-
-                glTranslated(x + 0.05, -buttonAmp, z + 0.05);
-                gl.DrawCylinder(0.05, 0.05);
+                    gl.DrawCylinder(0.05, 0.05);
+                    gl.SetColor(WHITE);
+                    glPushMatrix();
+                        glScaled(0.1, 0.1, 0.1);
+                        DisplayText(buttonLabels[button], 0, 0, 0);
+                    glPopMatrix();
                 glPopMatrix();
 
                 button++;
             }
+
             rows++;
         }
 
-        if (!firstRun) {
-            ctrl.InitButtons(rows, cols);
+        if (firstRun) {
+            ctrl.InitButtons(rows, cols, buttonLabels);
         }
     glPopMatrix();
 
@@ -502,7 +532,6 @@ void InitConfig(int argc, char* argv[]) {
         .SetTitle(WIN_TITLE)
         .Open(&argc, argv);
 
-    world.GetFan().Start();
     w.AddDisplayCallback(DisplayFunc)
         .AddKeyboardListeners(ASCIIKeysListener, NonASCIIKeysListener)
         .AddResizeCallback(ResizeFunc)

@@ -47,8 +47,6 @@ static GLfloat spotlightAngInc = 3.0;
 static GLfloat spotlightPos[4] = { 0.0, 2.0, 2.0, 1.0};
 static GLfloat spotlightDir[3] = { 0, 0, -1 };
 static GLfloat discoColor[3] = { 1.0, 0.5, 0.7 };
-
-
 static GLuint textures[13];
 
 void DisplayText(string str, GLfloat x, GLfloat y, GLfloat z) {
@@ -137,20 +135,6 @@ void Init() {
    tel.SetOnMaterial(MATERIAL_SILVER);
    tel.SetAudioChannelsFileNames(audioChannelsFileNames);
    world.GetFan().StartStop();
-}
-
-void DrawBox() {
-    glEnable(GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_2D, textures[12]);
-     Material::BindMaterial(MATERIAL_PEARL);
-    glPushMatrix();
-        glTranslated(0.0, -3, 0.0);
-        gluQuadricDrawStyle(sphere, GLU_FILL);
-        gluQuadricNormals(sphere, GLU_SMOOTH);
-        gluQuadricTexture(sphere, GL_TRUE);
-        gluSphere(sphere, 200, 100, 100);
-    glPopMatrix();
-    glDisable(GL_TEXTURE_2D);
 }
 
 void DisplayWalls() {
@@ -556,7 +540,6 @@ void DisplayFunc() {
     }
 
     DisplayLights();
-    DrawBox();
     DisplayFloor();
     DisplayWalls();
     DisplayTable();
@@ -780,7 +763,6 @@ void InitConfig(int argc, char* argv[]) {
     int screenWidth, screenHeight;
     GetDesktopResolution(screenWidth, screenHeight);
 
-
     w = GLWindow().SetDisplayMode(DISPLAY_MODE)
         .SetWidth(screenWidth)
         .SetHeight(screenHeight)
@@ -796,7 +778,6 @@ void InitConfig(int argc, char* argv[]) {
         .AddResizeCallback(ResizeFunc)
         .AddTimerCallback(100, TimerFunc)
         .Run();
-
 }
 
 int main(int argc, char * argv[]) {

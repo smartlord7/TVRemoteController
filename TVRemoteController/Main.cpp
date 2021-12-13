@@ -477,7 +477,7 @@ void DisplayFan() {
         glPopMatrix();
         glPushMatrix();
         glTranslated(0.0, 2.0, 0.0);
-            Material::BindMaterial(MATERIAL_SILVER);
+            Material::BindMaterial(MATERIAL_BLACK_PLASTIC);
             glPushMatrix();
                 glRotated(90.0, 1.0, 0.0, 0.0);
                 gl.DrawCylinder(1, 0.5);
@@ -494,14 +494,14 @@ void DisplayFan() {
                 glPushMatrix();
                     Material::BindMaterial(MATERIAL_WHITE_PLASTIC);
                     glRotated(fan.GetAngle(), 0.0, 0.0, 1.0);
-                    glScaled(1.0, 0.1, 1.0);
+                    glScaled(1.5, 0.1, 1);
                     gl.DrawSquare();
                 glPopMatrix();
 
                 glPushMatrix();
                     Material::BindMaterial(MATERIAL_WHITE_PLASTIC);
                     glRotated(fan.GetAngle() + 90, 0.0, 0.0, 1.0);
-                    glScaled(1.0, 0.1, 1.0);
+                    glScaled(1.5, 0.1, 1);
                     gl.DrawSquare();
                 glPopMatrix();
             glPopMatrix();

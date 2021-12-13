@@ -18,6 +18,7 @@ private:
 	Controller ctrl;
 	Television tel;
 	Grid grid;
+	unsigned long int timer;
 
 public:
 	static constexpr double DEFAULT_GRID_SIDE = 1.0;
@@ -50,6 +51,16 @@ public:
 
 	OpenGL GetOpenGL() {
 		return openGL;
+	}
+
+	int GetTimer() {
+		return timer;
+	}
+
+	WorldState& SetTimer(unsigned long int timer) {
+		this->timer = timer;
+
+		return *this;
 	}
 
 	WorldState& SetObserver(Observer observer) {

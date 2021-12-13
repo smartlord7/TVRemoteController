@@ -1,10 +1,10 @@
 #include <iostream>
+#include "GL/glut.h"
 #include "Main.h"
 #include "ScreenHelper.h"
 #include "GLWindow.h"
 #include "WorldState.h"
 #include "Observer.h"
-#include "GL/glut.h"
 #include "RgbImage.h"
 #include "Materials.h"
 
@@ -21,8 +21,9 @@ static Television& tel = world.GetTelevision();
 static Grid& grid = world.GetGrid();
 static bool firstRun = true;
 static RgbImage img;
+static GLUquadricObj * sphere = gluNewQuadric();
 
-static Color BLACK = Color(0.0, 0.0, 0.0, 1.0),
+static Color BLACK = Color(0.0, 0.0, 0.0, 0.0),
 WHITE = Color(1.0, 1.0, 1.0, 1.0),
 YELLOW = Color(1.0, 1.0, 0.0, 1.0),
 RED = Color(1.0, 0.0, 0.0, 1.0),
@@ -37,18 +38,18 @@ OCEAN_BLUE = Color(0.3, 0.5, 1.0, 1.0);
 static vector<string> buttonLabels = { "1", "2", "3", "^", "+AC", "-AC", "4", "5", "6", "v", "X", "X", "7", "8", "9", "+b", "X", "X", "ON/OFF", "+v", "-v", "-b", "X", "X"};
 static GLfloat ambientLight[4] = { 0.3, 0.4,0.5, 1.0 };
 
-
 static GLfloat localLightPos[4] = { 0.0, 3.0, 0.0, 1.0 };
 static GLfloat localLightAmb[4] = { 0, 0, 0, 0.0 };
-static GLfloat localLightDif[4] = { 0, 0, 0, 1.0 };
-static GLfloat localLightSpec[4] = { 0, 0, 0, 1.0 };
+static GLfloat localLightDif[4] = { 0, 0, 0, 0.0 };
+static GLfloat localLightSpec[4] = { 0, 0, 0, 0.0 };
 static GLfloat spotlightOpening = 0.0;
 static GLfloat spotlightAngInc = 3.0;
 static GLfloat spotlightPos[4] = { 0.0, 2.0, 2.0, 1.0};
-static GLfloat spotlightDir[] = { 0, 0, -1 };
+static GLfloat spotlightDir[3] = { 0, 0, -1 };
+static GLfloat discoColor[3] = { 1.0, 0.5, 0.7 };
 
 
-static GLuint textures[12];
+static GLuint textures[13];
 
 void DisplayText(string str, GLfloat x, GLfloat y, GLfloat z) {
     glRasterPos3f(x, y, z);
@@ -86,6 +87,7 @@ void LoadTextures() {
     LoadTexture("texture_channel7.bmp", &textures[9]);
     LoadTexture("texture_channel8.bmp", &textures[10]);
     LoadTexture("texture_channel9.bmp", &textures[11]);
+    LoadTexture("texture_box.bmp", &textures[12]);
 }
 
 void DisplayLights() {
@@ -114,7 +116,9 @@ void DisplayLights() {
 }
 
 void Init() {
-    gl.ClearColor(WHITE)
+    srand(time(NULL));
+
+    gl.ClearColor(BLACK)
         .SetShadeModel(GL_SMOOTH)
         .Enable(GL_DEPTH_TEST)
         .Enable(GL_NORMALIZE)
@@ -126,14 +130,31 @@ void Init() {
     DisplayLights();
 
    vector<Color> colorChannels = { CYAN, YELLOW, RED, GREEN, BLUE, GREY, ORANGE, PINK, OCEAN_BLUE };
+   vector<string> audioChannelsFileNames = { "audio_channel1", "audio_channel2", "audio_channel3", "audio_channel4", 
+       "audio_channel5", "audio_channel6", "audio_channel7","audio_channel8", "audio_channel9" };
    tel.SetColorChannels(colorChannels);
    tel.SetOffMaterial(MATERIAL_BLACK_PLASTIC);
-   tel.SetonMaterialr(MATERIAL_SILVER);
+   tel.SetOnMaterial(MATERIAL_SILVER);
+   tel.SetAudioChannelsFileNames(audioChannelsFileNames);
    world.GetFan().StartStop();
 }
 
+void DrawBox() {
+    glEnable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, textures[12]);
+     Material::BindMaterial(MATERIAL_PEARL);
+    glPushMatrix();
+        glTranslated(0.0, -3, 0.0);
+        gluQuadricDrawStyle(sphere, GLU_FILL);
+        gluQuadricNormals(sphere, GLU_SMOOTH);
+        gluQuadricTexture(sphere, GL_TRUE);
+        gluSphere(sphere, 200, 100, 100);
+    glPopMatrix();
+    glDisable(GL_TEXTURE_2D);
+}
+
 void DisplayWalls() {
-    double ceilingHeight = 7.0;
+    double ceilingHeight = 11.0;
     double s = grid.GetRes();
 
     Material::BindMaterial(MATERIAL_PEARL);
@@ -143,13 +164,13 @@ void DisplayWalls() {
         glNormal3d(1.0, 0.0, 0.0);
         glBegin(GL_QUADS);
         glTexCoord2f(0.0f, 0.0f);
-        glVertex3d(-10.0, 0.0, -10.0);
+        glVertex3d(-15.0, 0.0, -15.0);
         glTexCoord2f(1.0f, 0.0f);
-        glVertex3d(-10.0, ceilingHeight, -10.0);
+        glVertex3d(-15.0, ceilingHeight, -15.0);
         glTexCoord2f(1.0f, 1.0f);
-        glVertex3d(-10.0, ceilingHeight, 10.0);
+        glVertex3d(-15.0, ceilingHeight, 15.0);
         glTexCoord2f(0.0f, 1.0f);
-        glVertex3d(-10.0, 0.0, 10.0);
+        glVertex3d(-15.0, 0.0, 15.0);
         glEnd();
     glPopMatrix();
 
@@ -157,27 +178,13 @@ void DisplayWalls() {
         glNormal3d(-1.0, 0.0, 0.0);
         glBegin(GL_QUADS);
         glTexCoord2f(0.0f, 0.0f);
-        glVertex3d(10.0, 0.0, -10.0);
+        glVertex3d(15.0, 0.0, -15.0);
         glTexCoord2f(1.0f, 0.0f);
-        glVertex3d(10.0, ceilingHeight, -10.0);
+        glVertex3d(15.0, ceilingHeight, -15.0);
         glTexCoord2f(1.0f, 1.0f);
-        glVertex3d(10.0, ceilingHeight, 10.0);
+        glVertex3d(15.0, ceilingHeight, 15.0);
         glTexCoord2f(0.0f, 1.0f);
-        glVertex3d(10.0, 0.0, 10.0);
-        glEnd();
-    glPopMatrix();
-
-    glPushMatrix();
-        glNormal3d(0.0, 0.0, 1.0);
-        glBegin(GL_QUADS);
-        glTexCoord2f(0.0f, 0.0f);
-        glVertex3d(-10.0, 0.0, -10.0);
-        glTexCoord2f(1.0f, 0.0f);
-        glVertex3d(10.0, 0.0, -10.0);
-        glTexCoord2f(1.0f, 1.0f);
-        glVertex3d(10.0, ceilingHeight, -10.0);
-        glTexCoord2f(0.0f, 1.0f);
-        glVertex3d(-10.0, ceilingHeight, -10.0);
+        glVertex3d(15.0, 0.0, 15.0);
         glEnd();
     glPopMatrix();
 
@@ -185,21 +192,18 @@ void DisplayWalls() {
         glNormal3d(0.0, 0.0, -1.0);
         glBegin(GL_QUADS);
         glTexCoord2f(0.0f, 0.0f);
-        glVertex3d(-10.0, 0.0, 10.0);
+        glVertex3d(-15.0, 0.0, 15.0);
         glTexCoord2f(1.0f, 0.0f);
-        glVertex3d(10.0, 0.0, 10.0);
+        glVertex3d(15.0, 0.0, 15.0);
         glTexCoord2f(1.0f, 1.0f);
-        glVertex3d(10.0, ceilingHeight, 10.0);
+        glVertex3d(15.0, ceilingHeight, 15.0);
         glTexCoord2f(0.0f, 1.0f);
-        glVertex3d(-10.0, ceilingHeight, 10.0);
+        glVertex3d(-15.0, ceilingHeight, 15.0);
         glEnd();
     glPopMatrix();
-    glDisable(GL_TEXTURE_2D);
 
-    glEnable(GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_2D, textures[1]);
-    for (double x = -10.0; x < 10.0; x += s) {
-        for (double z = -10.0; z < 10.0; z += s) {
+    for (double x = -15.0; x < 15.0; x += s) {
+        for (double z = -15.0; z < 15.0; z += s) {
             glPushMatrix();
             glNormal3d(0.0, -1.0, 0.0);
             glBegin(GL_QUADS);
@@ -215,6 +219,20 @@ void DisplayWalls() {
             glPopMatrix();
         }
     }
+
+    glPushMatrix();
+        glNormal3d(0.0, 0.0, 1.0);
+        glBegin(GL_QUADS);
+        glTexCoord2f(0.0f, 0.0f);
+        glVertex3d(-15.0, 0.0, -15.0);
+        glTexCoord2f(1.0f, 0.0f);
+        glVertex3d(15.0, 0.0, -15.0);
+        glTexCoord2f(1.0f, 1.0f);
+        glVertex3d(15.0, ceilingHeight, -15.0);
+        glTexCoord2f(0.0f, 1.0f);
+        glVertex3d(-15.0, ceilingHeight, -15.0);
+        glEnd();
+    glPopMatrix();
     glDisable(GL_TEXTURE_2D);
 }
 
@@ -224,31 +242,32 @@ void DisplayFloor() {
 
     glEnable(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D, textures[0]);
-    for (double x = -10.0; x < 10.0; x += s) {
-        for (double z = -10.0; z < 10.0; z += s) {
+    for (double x = -15.0; x < 15.0; x += s) {
+        for (double z = -15.0; z < 15.0; z += s) {
             if (materialFlag) {
                 Material::BindMaterial(MATERIAL_JADE);
-            } else{
+            }
+            else {
                 Material::BindMaterial(MATERIAL_COPPER);
             }
 
             glPushMatrix();
-                glNormal3d(0.0, 1.0, 0.0);
-                glBegin(GL_QUADS);
-                glTexCoord2f(0.0f, 0.0f);
-                glVertex3d(x, 0, z);
-                glTexCoord2f(1.0f, 0.0f);
-                glVertex3d(x, 0, z + s);
-                glTexCoord2f(1.0f, 1.0f);
-                glVertex3d(x + s, 0, z + s);
-                glTexCoord2f(0.0f, 1.0f);
-                glVertex3d(x + s, 0, z);
-                glEnd();
+            glNormal3d(0.0, 1.0, 0.0);
+            glBegin(GL_QUADS);
+            glTexCoord2f(0.0f, 0.0f);
+            glVertex3d(x, 0.0, z);
+            glTexCoord2f(1.0f, 0.0f);
+            glVertex3d(x, 0.0, z + s);
+            glTexCoord2f(1.0f, 1.0f);
+            glVertex3d(x + s, 0.0, z + s);
+            glTexCoord2f(0.0f, 1.0f);
+            glVertex3d(x + s, 0.0, z);
+            glEnd();
             glPopMatrix();
 
-            materialFlag = !materialFlag;
         }
-   }
+            materialFlag = !materialFlag;
+    }
     glDisable(GL_TEXTURE_2D);
 }
 
@@ -294,6 +313,7 @@ void DisplayTable() {
                 glScaled(1.25, 1.25, 2.25);
                 glTranslated(0.0, 1.0 + 0.25, 0.1);
                 gl.DrawSquare();
+                glTranslated(0.0, 1.0, 3.0);
             glPopMatrix();
         }
 
@@ -320,6 +340,28 @@ void DisplayTable() {
         glPopMatrix();
         glDisable(GL_TEXTURE_2D);
     glPopMatrix();
+
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_BLEND);
+    glEnable(GL_COLOR_MATERIAL);
+    glColorMaterial(GL_FRONT, GL_DIFFUSE);
+    glColorMaterial(GL_FRONT, GL_SPECULAR);
+    glColorMaterial(GL_FRONT, GL_AMBIENT);
+    glPushMatrix();
+        glTranslated(1.5, 0.325 + 0.25 + 0.1 + 0.3, -8.0);
+        glColor4f(discoColor[0], discoColor[1], discoColor[2], 0.9);
+        glPushMatrix();
+            glTranslated(0.0, 0.3, 0.0);
+            glutSolidSphere(0.3, 100, 100);
+        glPopMatrix();
+        glColor4f(1, 1, 1, 0.2);
+        glPushMatrix();
+            glRotated(-90, 1.0, 0.0, 0.0);
+            glutSolidCone(0.2, 0.3, 100, 100);
+        glPopMatrix();
+    glPopMatrix();
+    glDisable(GL_COLOR_MATERIAL);
+    glDisable(GL_BLEND);
 }
 
 bool IsChannelButton(int b) {
@@ -447,10 +489,6 @@ void DisplayController() {
                     glScaled(0.06, 0.06, 0.06);
                     glRotated(90, 1.0, 0.0, 0.0);
                     glutSolidDodecahedron();
-                    /**glPushMatrix();
-                        Material::BindMaterial(MATERIAL_BLACK_PLASTIC);
-                        DisplayText(buttonLabels[button], 0, 0, 0);
-                    glPopMatrix();**/
                 glPopMatrix();
 
                 button++;
@@ -518,6 +556,7 @@ void DisplayFunc() {
     }
 
     DisplayLights();
+    DrawBox();
     DisplayFloor();
     DisplayWalls();
     DisplayTable();
@@ -547,6 +586,12 @@ void UpdateSpotlightPos() {
     spotlightPos[2] = pos.GetZ() - 8;
 
     UpdateSpotlightDirection();
+}
+
+void UpdateDiscoColor() {
+    discoColor[0] = (double) rand() / (double) RAND_MAX;
+    discoColor[1] = (double) rand() / (double) RAND_MAX;
+    discoColor[2] = (double) rand() / (double) RAND_MAX;
 }
 
 void ASCIIKeysListener(unsigned char key, int x, int y) {
@@ -669,6 +714,7 @@ void ASCIIKeysListener(unsigned char key, int x, int y) {
                 localLightSpec[2] = 1;
                 glLightfv(GL_LIGHT0, GL_DIFFUSE, localLightDif);
             }
+            break;
         case '4':
             grid.SetGridRes(grid.GetRes() - 0.1);
             break;
@@ -715,7 +761,13 @@ void ResizeFunc(int width, int height) {
 void TimerFunc(int value) {
     int time = 1;
 
+    world.SetTimer(world.GetTimer() + 100);
+
     world.GetFan().Spin(time);
+
+    if (world.GetTimer() % 1000 == 0) {
+        UpdateDiscoColor();
+    }
     w.Refresh().
       AddTimerCallback(time, TimerFunc);
 

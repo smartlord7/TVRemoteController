@@ -2,7 +2,11 @@
 #define TVREMOTECONTROLLER_TELEVISION_H
 
 #include <vector>
+#include <Windows.h>
+#include <mmsystem.h>
 #include "Material.h"
+#include <thread>
+#include <thread>
 
 using namespace std;
 
@@ -14,9 +18,29 @@ private:
 	int volume;
 	double brightness;
 	vector<Color> colorChannels;
+	vector<string> audioChannelsFileNames;
 	Color offColor;
 	Material offMaterial;
 	Material onMaterial;
+
+	void _UpdateAudioVolume() {
+		string cmd = "setaudio snd volume to " + volume;
+
+		mciSendStringA(cmd.c_str(), nullptr, 0, nullptr);
+	}
+
+	void _UpdateAudio(int prevChannel) {
+
+		string cmd = "stop " + audioChannelsFileNames[prevChannel];
+		mciSendString(cmd.c_str(), nullptr, 0, nullptr);
+
+		cmd = "open " + audioChannelsFileNames[channel] + ".wav alias " + audioChannelsFileNames[channel];
+		mciSendString(cmd.c_str(), nullptr, 0, nullptr);
+
+		_UpdateAudioVolume();
+		cmd = "play " + audioChannelsFileNames[channel];
+		mciSendString(cmd.c_str(), nullptr, 0, nullptr);
+	}
 public:
 	Television() {
 	}
@@ -62,12 +86,20 @@ public:
 		return onMaterial;
 	}
 
+	vector<string> GetAudioChannelsFileNames() {
+		return audioChannelsFileNames;
+	}
+
 	Television& TurnOnOff() {
 		on = !on;
 
 		if (on) {
+			_UpdateAudio(0);
 			brightness = 1.0;
+
 		} else {
+			string cmd = "stop " + audioChannelsFileNames[channel];
+			mciSendString(cmd.c_str(), nullptr, 0, nullptr);
 			brightness = 0.0;
 		}
 
@@ -75,24 +107,31 @@ public:
 	}
 
 	Television& SetChannel(int channel) {
+		int tmp = this->channel;
+
 		if (on) {
 			this->channel = channel % numChannels;
+			_UpdateAudio(tmp);
 		}
 
 		return *this;
 	}
 
 	Television& IncChannel() {
+		int tmp = this->channel;
 		if (on) {
 			this->channel = (channel + 1) % numChannels;
+			_UpdateAudio(tmp);
 		}
 
 		return *this;
 	}
 
 	Television& DecChannel() {
+		int tmp = this->channel;
 		if (on) {
 			this->channel = channel - 1 >= 0 ? channel -1 : numChannels - 1;
+			_UpdateAudio(tmp);
 		}
 
 		return *this;
@@ -101,6 +140,7 @@ public:
 	Television& IncVolume() {
 		if (on) {
 			this->volume++;
+			_UpdateAudioVolume();
 		}
 
 		return *this;
@@ -109,6 +149,7 @@ public:
 	Television& DecVolume() {
 		if (on) {
 			this->volume--;
+			_UpdateAudioVolume();
 		}
 
 		return *this;
@@ -133,7 +174,7 @@ public:
 		return *this;
 	}
 
-	Television& SetonMaterialr(Material onMaterial) {
+	Television& SetOnMaterial(Material onMaterial) {
 		this->onMaterial = onMaterial;
 
 		return *this;
@@ -144,6 +185,12 @@ public:
 			this->brightness = brightness;
 			this->onMaterial.SetSpecularLight(Color(onMaterial.GetSpecularLight().GetRed() * brightness, onMaterial.GetSpecularLight().GetGreen() * brightness, onMaterial.GetSpecularLight().GetBlue() * brightness));
 		}
+
+		return *this;
+	}
+
+	Television& SetAudioChannelsFileNames(vector<string> audioChannelsFileNames) {
+		this->audioChannelsFileNames = audioChannelsFileNames;
 
 		return *this;
 	}

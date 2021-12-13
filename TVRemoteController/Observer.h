@@ -34,9 +34,9 @@ namespace EasyGL {
 			OBS_DEFAULT_MIN_X = -10 + 1,
 			OBS_DEFAULT_MAX_X = 10 - 1,
 			OBS_DEFAULT_MIN_Y = 2,
-			OBS_DEFAULT_MAX_Y = 6,
-			OBS_DEFAULT_MIN_Z = -10 + 1,
-			OBS_DEFAULT_MAX_Z = 10 - 1;
+			OBS_DEFAULT_MAX_Y = 10,
+			OBS_DEFAULT_MIN_Z = -10 - 1,
+			OBS_DEFAULT_MAX_Z = 15;
         Point3D ORIGIN = Point3D(0.0, 0.0, 0.0),
                 OBS_INIT_POS = Point3D(0.0, 3.0, 8),
                 OBS_INIT_TARGET = Point3D(0.0, 1.0, 0.0);
@@ -235,9 +235,7 @@ namespace EasyGL {
 		}
 
 		Observer& MoveCamera(ObserverEnum cameraDirection) {
-		    /*Point3D newTarget;
-            Vector3D eyeVector, rightAxis;
-            double lengthEyeVector, currAngle, nextAngle;*/
+		   
             switch (cameraDirection) {
 
                 case CAMERA_LEFT:
@@ -253,19 +251,6 @@ namespace EasyGL {
                     target.SetY(target.GetY() + OBS_CAMERA_STEP);
                     break;
             }
-
-            /*if (cameraDirection == CAMERA_LEFT || cameraDirection == CAMERA_RIGHT) {
-                eyeVector = target - position;
-                lengthEyeVector = eyeVector.GetLength();
-
-                currAngle = acos((eyeVector * X_AXIS) / (lengthEyeVector * X_AXIS.GetLength()));
-                nextAngle = cameraDirection == CAMERA_LEFT ? currAngle + OBS_CAMERA_STEP : currAngle - OBS_CAMERA_STEP;
-                newTarget = Point3D(position.GetX() + lengthEyeVector * cos(nextAngle),
-                                    target.GetY(),
-                                    position.GetZ() + lengthEyeVector * sin(nextAngle));
-                SetTarget(newTarget);
-                UpdateObsLookAt();
-            }*/
 
             UpdateObsLookAt();
 

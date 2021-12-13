@@ -7,12 +7,12 @@ private:
 	double minRes;
 	double maxRes;
 public:
-	static constexpr double INIT_GRID_RES = 1.0;
+	static constexpr double GRID_INIT_RES = 1.1;
 	static constexpr double DEFAULT_GRID_MIN_RES = 0.2;
 	static constexpr double DEFAULT_GRID_MAX_RES = 2.0;
 
 	Grid() {
-		res = INIT_GRID_RES;
+		res = GRID_INIT_RES;
 		minRes = DEFAULT_GRID_MIN_RES;
 		maxRes = DEFAULT_GRID_MAX_RES;
 	}

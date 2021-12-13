@@ -38,8 +38,8 @@ namespace EasyGL {
 			OBS_DEFAULT_MIN_Z = -10 + 1,
 			OBS_DEFAULT_MAX_Z = 10 - 1;
         Point3D ORIGIN = Point3D(0.0, 0.0, 0.0),
-                OBS_INIT_POS = Point3D(0.0, 2.0, 8),
-                OBS_INIT_TARGET = Point3D(0.0, 0.0, 0.0);
+                OBS_INIT_POS = Point3D(0.0, 3.0, 8),
+                OBS_INIT_TARGET = Point3D(0.0, 1.0, 0.0);
         Vector3D OBS_INIT_UP_AXIS = Vector3D(0.0, 1.0, 0.0),
                 X_AXIS = Vector3D(1.0, 0.0, 0.0),
                 Y_AXIS = Vector3D(0.0, 1.0, 0.0),

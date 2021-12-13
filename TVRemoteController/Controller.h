@@ -17,7 +17,7 @@ private:
 	double spinnerAngle;
 
 public:
-	const double DEFAULT_CONTROLLER_SPIN_ANGLE_STEP = 3.0;
+	const double DEFAULT_CONTROLLER_SPIN_ANGLE_STEP = 4.0;
 
 	Controller() {
 	}

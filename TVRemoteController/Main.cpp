@@ -37,14 +37,15 @@ static vector<string> buttonLabels = { "1", "2", "3", "^", "+AC", "-AC", "4", "5
 static GLfloat ambientLight[4] = { 0.3, 0.4,0.5, 1.0 };
 
 
-static GLfloat localLightPos[4] = { 0.0, 3.0, -6.0, 1.0 };
+static GLfloat localLightPos[4] = { 0.0, 3.0, 0.0, 1.0 };
 static GLfloat localLightAmb[4] = { 0, 0, 0, 0.0 };
 static GLfloat localLightDif[4] = { 0, 0, 0, 1.0 };
 static GLfloat localLightSpec[4] = { 0, 0, 0, 1.0 };
-static GLfloat dirLightPos[4] = { 0.0, 5.0, 0.0, 0.0 };
-static GLfloat dirLightAmb[4] = { 1, 1, 1, 0.0 };
-static GLfloat dirLightDif[4] = { 1, 1, 1, 1.0 };
-static GLfloat dirLightSpec[4] = { 1, 1, 1, 1.0 };
+static GLfloat spotlightOpening = 0.0;
+static GLfloat spotlightAngInc = 3.0;
+static GLfloat spotlightPos[4] = { 0.0, 2.0, 2.0, 1.0};
+static GLfloat spotlightDir[] = { 0, 0, -1 };
+
 
 static GLuint textures[12];
 
@@ -77,6 +78,13 @@ void LoadTextures() {
     LoadTexture("texture_walls.bmp", &textures[2]);
     LoadTexture("texture_channel1.bmp", &textures[3]);
     LoadTexture("texture_channel2.bmp", &textures[4]);
+    LoadTexture("texture_channel3.bmp", &textures[5]);
+    LoadTexture("texture_channel4.bmp", &textures[6]);
+    LoadTexture("texture_channel5.bmp", &textures[7]);
+    LoadTexture("texture_channel6.bmp", &textures[8]);
+    LoadTexture("texture_channel7.bmp", &textures[9]);
+    LoadTexture("texture_channel8.bmp", &textures[10]);
+    LoadTexture("texture_channel9.bmp", &textures[11]);
 }
 
 void DisplayLights() {
@@ -85,6 +93,23 @@ void DisplayLights() {
     glLightfv(GL_LIGHT0, GL_AMBIENT, localLightAmb);
     glLightfv(GL_LIGHT0, GL_DIFFUSE, localLightDif);
     glLightfv(GL_LIGHT0, GL_SPECULAR, localLightSpec);
+
+    GLfloat spotLightColor[] = { 1, 0.0, 0.0, 0.0 };
+    GLfloat spotlightAk = 1.0;
+    GLfloat spotlightAl = 0;
+    GLfloat spotlightAq = 0.0f;
+    GLfloat spotlightExp = 0.0;
+
+    glLightfv(GL_LIGHT1, GL_POSITION, spotlightPos);
+    glLightfv(GL_LIGHT1, GL_DIFFUSE, spotLightColor);
+    glLightfv(GL_SPECULAR, GL_DIFFUSE, spotLightColor);
+    glLightfv(GL_AMBIENT, GL_DIFFUSE, spotLightColor);
+    glLightf(GL_LIGHT1, GL_CONSTANT_ATTENUATION, spotlightAk);
+    glLightf(GL_LIGHT1, GL_LINEAR_ATTENUATION, spotlightAl);
+    glLightf(GL_LIGHT1, GL_QUADRATIC_ATTENUATION, spotlightAq);
+    glLightf(GL_LIGHT1, GL_SPOT_CUTOFF, spotlightOpening);
+    glLightfv(GL_LIGHT1, GL_SPOT_DIRECTION, spotlightDir);
+    glLightf(GL_LIGHT1, GL_SPOT_EXPONENT, spotlightExp);
 }
 
 void Init() {
@@ -94,7 +119,7 @@ void Init() {
         .Enable(GL_NORMALIZE)
         .Enable(GL_LIGHTING)
         .Enable(GL_LIGHT0)
-        .Disable(GL_BLEND);
+        .Enable(GL_LIGHT1);
 
     LoadTextures();
     DisplayLights();
@@ -174,7 +199,7 @@ void DisplayWalls() {
     for (double x = -10; x <= 10; x++) {
         for (double z = -10; z <= 10; z++) {
             glPushMatrix();
-            glNormal3d(0, 1, 0);
+            glNormal3d(0.0, -1.0, 0.0);
             glBegin(GL_QUADS);
             glTexCoord2f(0.0f, 0.0f);
             glVertex3d(x, ceilingHeight, z);
@@ -205,7 +230,7 @@ void DisplayFloor() {
             }
 
             glPushMatrix();
-                glNormal3d(0, 1, 0);
+                glNormal3d(0.0, 1.0, 0.0);
                 glBegin(GL_QUADS);
                 glTexCoord2f(0.0f, 0.0f);
                 glVertex3d(x, 0, z);
@@ -503,6 +528,24 @@ void DisplayFunc() {
     }
 }
 
+void UpdateSpotlightDirection() {
+    Vector3D newDir = obs.GetTarget() - obs.GetPosition();
+
+    spotlightDir[0] = newDir.GetX();
+    spotlightDir[1] = newDir.GetY();
+    spotlightDir[2] = newDir.GetZ();
+}
+
+void UpdateSpotlightPos() {
+    Point3D pos = obs.GetPosition();
+    
+    spotlightPos[0] = pos.GetX();
+    spotlightPos[1] = pos.GetY();
+    spotlightPos[2] = pos.GetZ() - 8;
+
+    UpdateSpotlightDirection();
+}
+
 void ASCIIKeysListener(unsigned char key, int x, int y) {
     if (firstRun) {
         return;
@@ -512,6 +555,7 @@ void ASCIIKeysListener(unsigned char key, int x, int y) {
             tgt = world.GetObserver().GetTarget();
     int btn = ctrl.GetSelectedButton();
     int row = btn / ctrl.GetCols(), col = btn % ctrl.GetCols();
+    float nextAngle;
 
     switch (key) {
         case 'd':
@@ -576,11 +620,19 @@ void ASCIIKeysListener(unsigned char key, int x, int y) {
             break;
         case 'b':
         case 'B':
+            nextAngle = spotlightOpening - 1.0;
             ctrl.DecSpinnerAngle();
+            if (nextAngle >= 0) {
+                spotlightOpening = nextAngle;
+            }
             break;
         case 'm':
         case 'M':
+            nextAngle = spotlightOpening + 1.0;
             ctrl.IncSpinnerAngle();
+            if (nextAngle < 180) {
+                spotlightOpening = nextAngle;
+            }
             break;
         case '1':
             if (tel.IsOn()) {
@@ -617,7 +669,7 @@ void ASCIIKeysListener(unsigned char key, int x, int y) {
         default:
             return;
     }
-
+    UpdateSpotlightPos();
     w.Refresh();
 }
 
@@ -641,7 +693,7 @@ void NonASCIIKeysListener(int key, int x, int y) {
         default:
             return;
     }
-
+    UpdateSpotlightDirection();
     w.Refresh();
 }
 

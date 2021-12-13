@@ -95,7 +95,7 @@ public:
 
 		if (on) {
 			_UpdateAudio(0);
-			brightness = 1.0;
+			brightness = 0.5;
 
 		} else {
 			string cmd = "stop " + audioChannelsFileNames[channel];

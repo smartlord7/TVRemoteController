@@ -8,8 +8,8 @@ private:
 	double maxRes;
 public:
 	static constexpr double GRID_INIT_RES = 1.1;
-	static constexpr double DEFAULT_GRID_MIN_RES = 0.2;
-	static constexpr double DEFAULT_GRID_MAX_RES = 2.0;
+	static constexpr double DEFAULT_GRID_MIN_RES = 0.1;
+	static constexpr double DEFAULT_GRID_MAX_RES = 4.0;
 
 	Grid() {
 		res = GRID_INIT_RES;

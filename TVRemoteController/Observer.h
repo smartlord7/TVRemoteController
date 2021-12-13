@@ -235,7 +235,6 @@ namespace EasyGL {
 		}
 
 		Observer& MoveCamera(ObserverEnum cameraDirection) {
-		   
             switch (cameraDirection) {
 
                 case CAMERA_LEFT:

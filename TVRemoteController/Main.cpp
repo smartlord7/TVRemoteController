@@ -18,6 +18,7 @@ static OpenGL gl = world.GetOpenGL();
 static Spinner&  fan = world.GetFan();
 static Controller& ctrl = world.GetController();
 static Television& tel = world.GetTelevision();
+static Grid& grid = world.GetGrid();
 static bool firstRun = true;
 static RgbImage img;
 
@@ -133,6 +134,7 @@ void Init() {
 
 void DisplayWalls() {
     double ceilingHeight = 7.0;
+    double s = grid.GetRes();
 
     Material::BindMaterial(MATERIAL_PEARL);
     glEnable(GL_TEXTURE_2D);
@@ -145,9 +147,9 @@ void DisplayWalls() {
         glTexCoord2f(1.0f, 0.0f);
         glVertex3d(-10.0, ceilingHeight, -10.0);
         glTexCoord2f(1.0f, 1.0f);
-        glVertex3d(-10.0, ceilingHeight, 11.0);
+        glVertex3d(-10.0, ceilingHeight, 10.0);
         glTexCoord2f(0.0f, 1.0f);
-        glVertex3d(-10.0, 0.0, 11.0);
+        glVertex3d(-10.0, 0.0, 10.0);
         glEnd();
     glPopMatrix();
 
@@ -155,13 +157,13 @@ void DisplayWalls() {
         glNormal3d(-1.0, 0.0, 0.0);
         glBegin(GL_QUADS);
         glTexCoord2f(0.0f, 0.0f);
-        glVertex3d(11.0, 0.0, -10.0);
+        glVertex3d(10.0, 0.0, -10.0);
         glTexCoord2f(1.0f, 0.0f);
-        glVertex3d(11.0, ceilingHeight, -10.0);
+        glVertex3d(10.0, ceilingHeight, -10.0);
         glTexCoord2f(1.0f, 1.0f);
-        glVertex3d(11.0, ceilingHeight, 11.0);
+        glVertex3d(10.0, ceilingHeight, 10.0);
         glTexCoord2f(0.0f, 1.0f);
-        glVertex3d(11.0, 0.0, 11.0);
+        glVertex3d(10.0, 0.0, 10.0);
         glEnd();
     glPopMatrix();
 
@@ -171,9 +173,9 @@ void DisplayWalls() {
         glTexCoord2f(0.0f, 0.0f);
         glVertex3d(-10.0, 0.0, -10.0);
         glTexCoord2f(1.0f, 0.0f);
-        glVertex3d(11.0, 0.0, -10.0);
+        glVertex3d(10.0, 0.0, -10.0);
         glTexCoord2f(1.0f, 1.0f);
-        glVertex3d(11.0, ceilingHeight, -10.0);
+        glVertex3d(10.0, ceilingHeight, -10.0);
         glTexCoord2f(0.0f, 1.0f);
         glVertex3d(-10.0, ceilingHeight, -10.0);
         glEnd();
@@ -185,9 +187,9 @@ void DisplayWalls() {
         glTexCoord2f(0.0f, 0.0f);
         glVertex3d(-10.0, 0.0, 10.0);
         glTexCoord2f(1.0f, 0.0f);
-        glVertex3d(11.0, 0.0, 10.0);
+        glVertex3d(10.0, 0.0, 10.0);
         glTexCoord2f(1.0f, 1.0f);
-        glVertex3d(11.0, ceilingHeight, 10.0);
+        glVertex3d(10.0, ceilingHeight, 10.0);
         glTexCoord2f(0.0f, 1.0f);
         glVertex3d(-10.0, ceilingHeight, 10.0);
         glEnd();
@@ -196,19 +198,19 @@ void DisplayWalls() {
 
     glEnable(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D, textures[1]);
-    for (double x = -10; x <= 10; x++) {
-        for (double z = -10; z <= 10; z++) {
+    for (double x = -10.0; x < 10.0; x += s) {
+        for (double z = -10.0; z < 10.0; z += s) {
             glPushMatrix();
             glNormal3d(0.0, -1.0, 0.0);
             glBegin(GL_QUADS);
             glTexCoord2f(0.0f, 0.0f);
             glVertex3d(x, ceilingHeight, z);
             glTexCoord2f(1.0f, 0.0f);
-            glVertex3d(x, ceilingHeight, z + 1.0);
+            glVertex3d(x, ceilingHeight, z + s);
             glTexCoord2f(1.0f, 1.0f);
-            glVertex3d(x + 1.0, ceilingHeight, z + 1.0);
+            glVertex3d(x + s, ceilingHeight, z + s);
             glTexCoord2f(0.0f, 1.0f);
-            glVertex3d(x + 1.0, ceilingHeight, z);
+            glVertex3d(x + s, ceilingHeight, z);
             glEnd();
             glPopMatrix();
         }
@@ -218,11 +220,12 @@ void DisplayWalls() {
 
 void DisplayFloor() {
     bool materialFlag = true;
+    double s = grid.GetRes();
 
     glEnable(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D, textures[0]);
-    for (double x = -10; x <= 10; x++) {
-        for (double z = -10; z <= 10; z++) {
+    for (double x = -10.0; x < 10.0; x += s) {
+        for (double z = -10.0; z < 10.0; z += s) {
             if (materialFlag) {
                 Material::BindMaterial(MATERIAL_JADE);
             } else{
@@ -235,11 +238,11 @@ void DisplayFloor() {
                 glTexCoord2f(0.0f, 0.0f);
                 glVertex3d(x, 0, z);
                 glTexCoord2f(1.0f, 0.0f);
-                glVertex3d(x, 0, z + 1.0);
+                glVertex3d(x, 0, z + s);
                 glTexCoord2f(1.0f, 1.0f);
-                glVertex3d(x + 1.0, 0, z + 1.0);
+                glVertex3d(x + s, 0, z + s);
                 glTexCoord2f(0.0f, 1.0f);
-                glVertex3d(x + 1.0, 0, z);
+                glVertex3d(x + s, 0, z);
                 glEnd();
             glPopMatrix();
 
@@ -666,6 +669,12 @@ void ASCIIKeysListener(unsigned char key, int x, int y) {
                 localLightSpec[2] = 1;
                 glLightfv(GL_LIGHT0, GL_DIFFUSE, localLightDif);
             }
+        case '4':
+            grid.SetGridRes(grid.GetRes() - 0.1);
+            break;
+        case '5':
+            grid.SetGridRes(grid.GetRes() + 0.1);
+            break;
         default:
             return;
     }

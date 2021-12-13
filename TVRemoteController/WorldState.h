@@ -6,6 +6,7 @@
 #include "Button.h"
 #include "Controller.h"
 #include "Television.h"
+#include "Grid.h"
 
 using namespace EasyGL;
 
@@ -16,8 +17,11 @@ private:
 	Spinner ACfan;
 	Controller ctrl;
 	Television tel;
+	Grid grid;
 
 public:
+	static constexpr double DEFAULT_GRID_SIDE = 1.0;
+
 	WorldState() {
 	}
 
@@ -38,6 +42,10 @@ public:
 
 	Television& GetTelevision() {
 		return tel;
+	}
+
+	Grid& GetGrid() {
+		return grid;
 	}
 
 	OpenGL GetOpenGL() {

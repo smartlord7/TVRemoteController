@@ -85,7 +85,6 @@ void LoadTextures() {
     LoadTexture("texture_channel7.bmp", &textures[9]);
     LoadTexture("texture_channel8.bmp", &textures[10]);
     LoadTexture("texture_channel9.bmp", &textures[11]);
-    LoadTexture("texture_box.bmp", &textures[12]);
 }
 
 void DisplayLights() {
@@ -348,9 +347,6 @@ void DisplayTable() {
     glDisable(GL_BLEND);
 }
 
-bool IsChannelButton(int b) {
-    return 0 <= b && b <= 2 || 6 <= b && b <= 8 || 12 <= b && b <= 14;
-}
 
 void UpdateTVLight() {
     localLightDif[0] = tel.GetBrightness();
@@ -591,26 +587,26 @@ void ASCIIKeysListener(unsigned char key, int x, int y) {
     switch (key) {
         case 'd':
         case 'D':
-            obs.MoveHorizontally(WALK_RIGHT);
+            obs.Move(WALK_RIGHT);
             break;
         case 'a':
         case 'A':
-            obs.MoveHorizontally(WALK_LEFT);
+            obs.Move(WALK_LEFT);
             break;
         case 's':
         case 'S':
-            obs.MoveHorizontally(WALK_BACK);
+            obs.Move(WALK_BACK);
             break;
         case 'w':
         case 'W':
-            obs.MoveHorizontally(WALK_FRONT);
+            obs.Move(WALK_FRONT);
             break;
         case ' ':
-            obs.MoveVertically(FLY_UP);
+            obs.Move(FLY_UP);
             break;
         case '<':
         case '>':
-            obs.MoveVertically(FLY_DOWN);
+            obs.Move(FLY_DOWN);
             break;
         case 'j':
         case 'J':
@@ -718,16 +714,16 @@ void NonASCIIKeysListener(int key, int x, int y) {
 
     switch (key) {
         case GLUT_KEY_LEFT:
-            obs.MoveCamera(CAMERA_LEFT);
+            obs.RotateCamera(CAMERA_LEFT);
             break;
         case GLUT_KEY_RIGHT:
-            obs.MoveCamera(CAMERA_RIGHT);
+            obs.RotateCamera(CAMERA_RIGHT);
             break;
         case GLUT_KEY_DOWN:
-            obs.MoveCamera(CAMERA_DOWN);
+            obs.RotateCamera(CAMERA_DOWN);
             break;
         case GLUT_KEY_UP:
-            obs.MoveCamera(CAMERA_UP);
+            obs.RotateCamera(CAMERA_UP);
         default:
             return;
     }
@@ -744,8 +740,8 @@ void ResizeFunc(int width, int height) {
 void TimerFunc(int value) {
     int time = 1;
 
+    obs.UpdateCamera().UpdatePosition();
     world.SetTimer(world.GetTimer() + 100);
-
     world.GetFan().Spin(time);
 
     if (world.GetTimer() % 1000 == 0) {
@@ -757,6 +753,7 @@ void TimerFunc(int value) {
     if (!firstRun) {
         ctrl.UpdateController(time);
     }
+
 }
 
 void InitConfig(int argc, char* argv[]) {
